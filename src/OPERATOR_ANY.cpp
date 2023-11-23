@@ -227,6 +227,10 @@ bool operator<(std::any const &a1,std::any const &a2){
     }
     throw std::runtime_error("Undefined at operator<");
 }
+bool operator>(std::any const &a1, std::any const &a2){
+    return (a2 < a1);
+}
+
 bool operator>=(std::any const &a1, std::any const &a2){
     return !(a1 < a2);
 }
@@ -238,7 +242,18 @@ bool operator<=(std::any const &a1, std::any const &a2){
 bool operator!=(std::any const &a1, std::any const &a2){
     return !(a1 == a2);
 }
-
+//AugAssign
+//TLE
+std::any& operator+=(std::any &a1, std::any const &a2){
+    return a1 = a1 + a2;
+}
+std::any& operator-=(std::any &a1, std::any const &a2){
+    return a1 = a1 - a2;
+}
+std::any& operator*=(std::any &a1, std::any const &a2){
+    return a1 = a1 * a2;
+}
+std::any& operator%=(std::any &a1, std::any const &a2);//TODO
 
 
 std::ostream &operator<<(std::ostream &os, std::any const &a){
