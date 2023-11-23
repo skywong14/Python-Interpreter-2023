@@ -27,6 +27,7 @@ bool is_None(std::any const &a);
 Int to_Int(std::any const &a);
 double to_Double(std::any const &a);
 std::string to_String(std::any const &a);
+bool to_Bool(std::any const &a);
 std::any operator+(std::any const &a1,std::any const &a2);
 std::any operator-(std::any const &a1,std::any const &a2);
 std::any operator*(std::any const &a1,std::any const &a2);
@@ -37,6 +38,7 @@ std::any DivDouble(std::any const &a1,std::any const &a2);
 // 比较运算符
 bool operator==(std::any const &a1,std::any const &a2);
 bool operator<(std::any const &a1,std::any const &a2);
+bool operator>(std::any const &a1,std::any const &a2);
 bool operator>=(std::any const &a1, std::any const &a2);
 bool operator<=(std::any const &a1, std::any const &a2);
 bool operator!=(std::any const &a1, std::any const &a2);

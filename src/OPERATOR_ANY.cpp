@@ -227,6 +227,10 @@ bool operator<(std::any const &a1,std::any const &a2){
     }
     throw std::runtime_error("Undefined at operator<");
 }
+bool operator>(std::any const &a1, std::any const &a2){
+    return (a2 < a1);
+}
+
 bool operator>=(std::any const &a1, std::any const &a2){
     return !(a1 < a2);
 }
