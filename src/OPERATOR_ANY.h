@@ -49,6 +49,12 @@ std::any& operator-=(std::any &a1, std::any const &a2);
 std::any& operator*=(std::any &a1, std::any const &a2);
 std::any& operator%=(std::any &a1, std::any const &a2); //TODO 待实现
 //输出流
-std::ostream &operator<<(std::ostream &os, std::any const &a);
+std::ostream &operator<<(std::ostream &os, std::any const &a); //TODO
+
+//一些枚举量
+enum class AugassignType{ //枚举augassign的类型
+    equal,add,sub,mul,div,idiv,mod,none
+};
+
 
 #endif

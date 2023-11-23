@@ -132,3 +132,39 @@ std::any EvalVisitor::visitTerm(Python3Parser::TermContext *ctx){
     }
     return now_v;
 }
+
+//函数操作
+std::any EvalVisitor::visitAugassign(Python3Parser::AugassignContext *ctx) {
+    if (ctx->ADD_ASSIGN())
+        return AugassignType::add;
+    else if (ctx->SUB_ASSIGN())
+        return AugassignType::sub;
+    else if (ctx->MULT_ASSIGN())
+        return AugassignType::mul;
+    else if (ctx->DIV_ASSIGN())
+        return AugassignType::div;
+    else if (ctx->IDIV_ASSIGN())
+        return AugassignType::idiv;
+    else if (ctx->MOD_ASSIGN())
+        return AugassignType::mod;
+    else
+        return AugassignType::none;
+}
+
+std::any EvalVisitor::visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx){
+    if (!(ctx->ASSIGN(0) || ctx->augassign())) return visitChildren(ctx);
+    //先按等号分割
+    auto ctx1 = ctx->testlist(); // ctx1:所有testlist
+    int left_v_num = static_cast<int>(ctx1.size()) - 1;
+    std::vector<std::any> right_v = std::any_cast<std::vector<std::any> >(visitTestlist(ctx1.back()));
+    //ATTENTION: visitTestlist返回一个vector！！！(release后如果是单个元素，加上一层）
+    int right_size = right_v.size();
+    //right_size = 1 or right_size > 1
+    for (int i = 0; i < left_v_num; i++){
+        std::vector<std::any> left_v = std::any_cast<std::vector<std::any> >(visitTestlist(ctx1.back()));
+        if (left_v.size() == 1){
+
+        }
+    }
+
+}
