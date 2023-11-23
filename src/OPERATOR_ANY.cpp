@@ -10,6 +10,11 @@ double Int_to_Double(long long x){
     return (double)x;
 }
 
+//关于变量
+bool is_variable(std::any const &a){
+    return (std::any_cast<std::pair<std::string, std::any> >(&a) != nullptr);
+}
+
 //判断类型
 
 bool is_Int(std::any const &a){
@@ -38,9 +43,9 @@ bool is_None(std::any const &a){
 }
 
 void release_Var(std::any &a){ //把(var)释放成var
+    //ATTENTION:()也是Tuple，而不是None
     std::vector<std::any>* ptr1=std::any_cast<std::vector<std::any> >(&a);
-    if (!ptr1) return;
-    if (ptr1->empty()) a.reset(); //清空any
+    if (!ptr1) return;//Tuple()
     if (ptr1->size() == 1) a = (*ptr1)[0];
     if (ptr1->size() > 0){
             for (int i = 0; i < ptr1->size(); i++)//ATTENTION:这里用了小int
