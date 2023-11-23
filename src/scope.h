@@ -1,0 +1,8 @@
+//
+// Created by skywa on 2023/11/23.
+//
+
+#ifndef PYTHON_INTERPRETER_SCOPE_H
+#define PYTHON_INTERPRETER_SCOPE_H
+
+#endif //PYTHON_INTERPRETER_SCOPE_H
