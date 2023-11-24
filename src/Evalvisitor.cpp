@@ -14,19 +14,36 @@ tfpdef: NAME ;
  */
 
 
-
-
-
 //三种FLOW-stmt
 
-//IF WHILE
+//IF WHILE RETURN
 
 
 
 
 
-//基本操作
-//Test
+
+//stmt操作
+
+std::any EvalVisitor::visitSimple_stmt(Python3Parser::Simple_stmtContext *ctx) {
+    return visitSmall_stmt(ctx->small_stmt());
+}
+//suite
+std::any EvalVisitor::visitSuite(Python3Parser::SuiteContext *ctx) {
+    //简单语句
+    if (ctx->simple_stmt()){
+        std::any st1 = visitSimple_stmt(ctx->simple_stmt());
+        //TODO 有flow则退出
+    }
+    //复合语句：依次执行，除非有flow控制
+    for (int i = 0; ctx->stmt(i); i++){
+        std::any st1 = visitStmt(ctx->stmt(i));
+        //TODO 有flow则退出
+    }
+    return {};
+}
+
+
 
 //Or_test  && And_test
 std::any EvalVisitor::visitOr_test(Python3Parser::Or_testContext *ctx){
@@ -156,17 +173,48 @@ std::any EvalVisitor::visitAugassign(Python3Parser::AugassignContext *ctx) {
         return AugassignType::none;
 }
 
+
+
+//Factor
+
+//atom和atom expr
+
+
+//TEST
+
+
+//Testlist 必须是一个vector
+std::any EvalVisitor::visitTestlist(Python3Parser::TestlistContext *ctx){
+    std::vector<std::any> vars;
+    vars.clear();
+    for (int i = 0; auto ctx2 = ctx->test(i); i++) {
+        std::any res = visitTest(ctx2);
+        //Tuple或单个元素
+        if (is_Tuple(res)){
+            std::vector<std::any> vars2 = std::any_cast<std::vector<std::any>>(res);
+            for (int i = 0 ; i < vars2.size(); i++)
+                vars.emplace_back( vars2[i] );
+            //TLE:使用vector的insert?
+        }else{
+            vars.emplace_back(std::move(res));
+        }
+    }
+    return vars;
+}
+
+//Expr:expr_stmt: testlist ( (augassign testlist) | ('=' testlist)*);
 std::any EvalVisitor::visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx){
     if (!(ctx->ASSIGN(0) || ctx->augassign())) return visitChildren(ctx);
     //先按等号分割
-    auto ctx1 = ctx->testlist(); // ctx1:所有testlist
+    auto ctx1 = ctx->testlist(); // ctx1:所有testlist,除最后一个外为左值
     int left_v_num = static_cast<int>(ctx1.size()) - 1;
     std::vector<std::any> right_v = std::any_cast<std::vector<std::any> >(visitTestlist(ctx1.back()));
     //ATTENTION: visitTestlist返回一个vector！！！(release后如果是单个元素，加上一层）
     int right_size = right_v.size();
     //right_size = 1 or right_size > 1
+    //TODO
     for (int i = 0; i < left_v_num; i++){
-        std::vector<std::any> left_v = std::any_cast<std::vector<std::any> >(visitTestlist(ctx1.back()));
+        std::vector<std::any> left_v = std::any_cast<std::vector<std::any> >(visitTestlist(ctx1[i]));
         if (left_v.size() == 1){
 
         }

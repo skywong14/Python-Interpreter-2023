@@ -49,9 +49,8 @@ void release_Var(std::any &a){ //把(var)释放成var
     if (ptr1->size() == 1) a = (*ptr1)[0];
     if (ptr1->size() > 0){
             for (int i = 0; i < ptr1->size(); i++)//ATTENTION:这里用了小int
-            release_Var( (*ptr1)[i] );
+                release_Var( (*ptr1)[i] );
     }
-    return;
 }//PERHAPS WRONG!!!!!
 
 //类型转换
