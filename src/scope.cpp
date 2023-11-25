@@ -66,7 +66,7 @@ std::any func_call(std::string Name, EvalVisitor &vis, Python3Parser::ArglistCon
 
 //变量部分
 NameSpace empty_namespace;
-std::vector<NameSpace> scope = {};
+std::vector<NameSpace> scope = {empty_namespace};
 
 Scope_it null_Scope(){
     return scope.end();
@@ -76,7 +76,7 @@ Scope_it null_Scope(){
 void set_Variable(std::string Name, std::any val){
     auto it = scope.end();
     it--;
-    (*it).Names[Name]=val;
+    (*it).set_New(Name, val);
     /*Variable_it ptr = search_Scope(scope.end(), Name);
     if (ptr.first != scope.end()){
         (*(ptr.second)).second = val;
@@ -89,9 +89,6 @@ Variable_it search_Scope(std::string var_Name){
     return search_Scope(scope.end(), var_Name);
 }
 Variable_it search_Scope(Scope_it it_Scope, std::string var_Name){
-    if (it_Scope == scope.begin()){//未找到范围scope.end()
-        return std::make_pair(scope.end(), empty_namespace.Names.end());
-    }
 
     if (it_Scope == scope.end()) it_Scope--;
 
@@ -99,6 +96,9 @@ Variable_it search_Scope(Scope_it it_Scope, std::string var_Name){
     if (ptr != (*it_Scope).Names.end()){//当前空间存在变量
         return std::make_pair(it_Scope, ptr);
     }else{
+        if (it_Scope == scope.begin()){//未找到范围scope.end()
+            return std::make_pair(scope.end(), empty_namespace.Names.end());
+        }
         it_Scope--;
         return search_Scope(it_Scope, var_Name);
     }

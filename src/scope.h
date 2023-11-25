@@ -43,7 +43,11 @@ struct NameSpace{
     }
     NameSpace(std::string str1, std::any a1){
         Names.clear();
-        Names[str1]=a1;
+        Names[str1] = a1;
+    }
+    void set_New(std::string Name, std::any val){
+//        Names.insert(std::make_pair(Name, val));
+        Names[Name] = val;
     }
 };
 

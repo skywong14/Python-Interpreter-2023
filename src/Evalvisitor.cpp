@@ -40,6 +40,8 @@ std::any EvalVisitor::visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx){
     auto ctx1 = ctx->testlist(); // ctx1:所有testlist,除最后一个外为左值
     int left_v_num = static_cast<int>(ctx1.size()) - 1;
     std::vector<std::any> right_v = std::any_cast<std::vector<std::any> >(visitTestlist(ctx1.back()));
+    std::any right_v_all = right_v;
+    release_Var(right_v_all);
     //ATTENTION: visitTestlist返回一个vector！！！(release后如果是单个元素，加上一层）
     int right_size = right_v.size();
     //right_size = 1 or right_size > 1
@@ -49,10 +51,11 @@ std::any EvalVisitor::visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx){
         std::vector<std::any> left_v = std::any_cast<std::vector<std::any> >(visitTestlist(ctx1[i]));
         if (left_v.size() == 1){
             Variable_name = to_String(left_v[0]);
-            set_Variable(Variable_name, right_v);
+            set_Variable(Variable_name, right_v_all);
+            Debug_output("____LEFT_V==1____");
         }
     }
-
+    return {};
 }
 //stmt操作
 std::any EvalVisitor::visitSimple_stmt(Python3Parser::Simple_stmtContext *ctx){

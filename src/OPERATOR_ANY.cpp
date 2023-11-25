@@ -59,8 +59,10 @@ void release_Var(std::any &a){ //把(var)释放成var
     std::vector<std::any>* ptr1=std::any_cast<std::vector<std::any> >(&a);
     if (!ptr1) return;//Tuple()
     Debug_output("IS TUPLE");
-    if (ptr1->size() == 1) a = (*ptr1)[0];
-    if (ptr1->size() > 0){
+    if (ptr1->size() == 1) {
+        a = (*ptr1)[0];
+        release_Var(a);
+    }else if (ptr1->size() > 0){
             for (int i = 0; i < ptr1->size(); i++)//ATTENTION:这里用了小int
                 release_Var( (*ptr1)[i] );
     }
