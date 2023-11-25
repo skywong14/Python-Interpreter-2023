@@ -9,6 +9,14 @@
 double Int_to_Double(long long x){
     return (double)x;
 }
+long long String_to_Int(std::string x){
+    int len = x.length();
+    long long ans=0;
+    for (int i = len - 1; i; i--){
+        ans = ans * 10 + x[i] - 48;
+    }
+    return ans;
+}
 
 //关于变量
 bool is_variable(std::any const &a){
@@ -176,8 +184,9 @@ std::any operator/(std::any const &a1,std::any const &a2){
 std::any operator-(std::any const &a1) {
     if (is_Double(a1))
         return -to_Double(a1);
-    else
+    else if (is_Integer(a1))
         return -to_Int(a1);
+    throw std::runtime_error("Undefined at operator set_positive");
 }
 
 //div & mod
@@ -199,7 +208,26 @@ std::any DivDouble(std::any const &a1,std::any const &a2){
     }
     throw std::runtime_error("Undefined at operator DivDouble");
 }
+std::any operator%(std::any const &a1, std::any const &a2){
+    return a1 - DivInt(a1, a2) * a2;
+}
+//Augassign
+std::any &operator+=(std::any &a1, std::any const &a2){
+    return a1 = a1 + a2;
+}
 
+std::any &operator-=(std::any &a1, std::any const &a2){
+    return a1 = a1 - a2;
+}
+
+std::any &operator*=(std::any &a1, std::any const &a2){
+    return a1 = a1 * a2;
+}
+
+std::any &operator%=(std::any &a1, std::any const &a2){
+    a1 -= DivInt(a1, a2) * a2;
+    return a1;
+}
 
 //位运算 Question:需要实现吗
 
@@ -247,19 +275,6 @@ bool operator!=(std::any const &a1, std::any const &a2){
     return !(a1 == a2);
 }
 //AugAssign
-//TLE
-std::any& operator+=(std::any &a1, std::any const &a2){
-    return a1 = a1 + a2;
-}
-std::any& operator-=(std::any &a1, std::any const &a2){
-    return a1 = a1 - a2;
-}
-std::any& operator*=(std::any &a1, std::any const &a2){
-    return a1 = a1 * a2;
-}
-std::any& operator%=(std::any &a1, std::any const &a2);//TODO
-
-
 std::ostream &operator<<(std::ostream &os, std::any const &a){
     if (is_None(a)) os << "None";
     else if (is_Bool(a)) os << (to_Bool(a) ? "True" : "False");

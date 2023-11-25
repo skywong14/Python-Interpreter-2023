@@ -175,11 +175,48 @@ std::any EvalVisitor::visitAugassign(Python3Parser::AugassignContext *ctx) {
 
 
 
-//Factor
+//Factor (正负号）
+std::any EvalVisitor::visitFactor(Python3Parser::FactorContext *ctx){
+    //No factor->expr
+    if (ctx->atom_expr()) return visitAtom_expr(ctx->atom_expr());
+    //have factor-> factor
+    std::any inside = visitFactor(ctx->factor());
+    release_Var(inside);
+    if (ctx->MINUS()) inside = -inside;
+    return inside;
+}
 
 //atom和atom expr
+std::any EvalVisitor::visitAtom_expr(Python3Parser::Atom_exprContext *ctx){
+    if (ctx->trailer()){ //有括号，是函数
+        std::string Name = to_String( visitAtom(ctx->atom()) );
+        return func_call(Name, *this, ctx->trailer()->arglist());
+    }else{
+        std::any val = visitAtom(ctx->atom());
+        release_Var(val);
+        return val;
+    }
+}
 
-
+std::any EvalVisitor::visitAtom(Python3Parser::AtomContext *ctx){
+    if (ctx->NAME())
+        return get_Value( ctx->getText() );
+    if (ctx->NUMBER()) {
+        std::string str = ctx->getText();
+        if (str.find('.') == std::string::npos)
+            return String_to_Int(str); //to Int
+        else
+            return std::stod(str); //to Double
+    }
+    else if (ctx->NONE())
+        return {};
+    else if (ctx->TRUE())
+        return true;
+    else if (ctx->FALSE())
+        return false;
+    else if (ctx->test())
+        return visitTest(ctx->test());
+}
 //TEST
 
 

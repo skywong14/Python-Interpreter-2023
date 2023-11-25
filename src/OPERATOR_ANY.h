@@ -10,6 +10,7 @@
 
 //供测试用
 double Int_to_Double(long long x);
+long long String_to_Int(std::string x);
 
 //关于变量
 bool is_variable(std::any const &a);
