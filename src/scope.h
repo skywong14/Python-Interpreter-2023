@@ -4,19 +4,23 @@
 #pragma once
 #include <iostream>
 #include <vector>
+#include <map>
 #include <any>
 #include <cstring>
 #include "OPERATOR_ANY.h"
 #ifndef PYTHON_INTERPRETER_SCOPE_H
 #define PYTHON_INTERPRETER_SCOPE_H
-
+//函数空间
 struct NameSpace{
     std::map<std::string, std::any> Names;
-    NameSpace(std::string str1,std::any a1){
+    NameSpace(std::string str1, std::any a1){
         Names.clear();
         Names[str1]=a1;
     }
 };
+
+
+//变量空间
 typedef std::vector<NameSpace>::iterator Scope_it;
 typedef std::map<std::string, std::any>::iterator Names_it;
 typedef std::pair<Scope_it ,Names_it> Variable_it;
