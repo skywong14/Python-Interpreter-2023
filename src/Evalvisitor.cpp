@@ -208,12 +208,12 @@ std::any EvalVisitor::visitAtom(Python3Parser::AtomContext *ctx){
         else
             return std::stod(str); //to Double
     }
-    else if (ctx->NONE())
-        return {};
     else if (ctx->TRUE())
         return true;
     else if (ctx->FALSE())
         return false;
+    else if (ctx->NONE())
+        return {};
     else if (ctx->test())
         return visitTest(ctx->test());
 }

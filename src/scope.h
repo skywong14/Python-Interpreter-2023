@@ -39,7 +39,7 @@ std::any func_call(std::string Name, EvalVisitor &vis, Python3Parser::ArglistCon
     while (func_scope_it != func_scope.begin()){
         auto find_it = (*func_scope_it).Names.find(Name);
         if ( find_it != (*func_scope_it).Names.end()) {
-            return ;//TODO
+            return {};//TODO
         }
         func_scope_it--;
     }
