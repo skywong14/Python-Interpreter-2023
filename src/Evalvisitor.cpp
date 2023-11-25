@@ -173,8 +173,6 @@ std::any EvalVisitor::visitAugassign(Python3Parser::AugassignContext *ctx) {
         return AugassignType::none;
 }
 
-
-
 //Factor 正负号
 std::any EvalVisitor::visitFactor(Python3Parser::FactorContext *ctx){
     //No factor->expr
@@ -186,7 +184,7 @@ std::any EvalVisitor::visitFactor(Python3Parser::FactorContext *ctx){
     return inside;
 }
 
-//atom和atom expr
+//atom 和 atom expr
 std::any EvalVisitor::visitAtom_expr(Python3Parser::Atom_exprContext *ctx){
     if (ctx->trailer()){ //有括号，是函数
         std::string Name = to_String( visitAtom(ctx->atom()) );
