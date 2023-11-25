@@ -5,6 +5,10 @@
 #include "OPERATOR_ANY.h"
 #include <vector>
 #define Int long long
+//For debug only
+void Debug_output(std::string s){
+    std::cout<<s<<std::endl;
+}
 //供测试用
 double Int_to_Double(long long x){
     return (double)x;
@@ -12,7 +16,7 @@ double Int_to_Double(long long x){
 long long String_to_Int(std::string x){
     int len = x.length();
     long long ans=0;
-    for (int i = len - 1; i; i--){
+    for (int i = len - 1; i >= 0; i--){
         ans = ans * 10 + x[i] - 48;
     }
     return ans;
@@ -54,6 +58,7 @@ void release_Var(std::any &a){ //把(var)释放成var
     //ATTENTION:()也是Tuple，而不是None
     std::vector<std::any>* ptr1=std::any_cast<std::vector<std::any> >(&a);
     if (!ptr1) return;//Tuple()
+    Debug_output("IS TUPLE");
     if (ptr1->size() == 1) a = (*ptr1)[0];
     if (ptr1->size() > 0){
             for (int i = 0; i < ptr1->size(); i++)//ATTENTION:这里用了小int
@@ -108,7 +113,7 @@ bool to_Bool(std::any const &a){
 }
 
 //四则运算
-std::any operator+(std::any const &a1,std::any const &a2){
+std::any operator+(std::any const &a1, std::any const &a2){
     std::any a3;
     //Int Double Bool运算时返回数字
     if (is_Number(a1) && is_Number(a2)){
@@ -134,7 +139,7 @@ std::any operator+(std::any const &a1,std::any const &a2){
     throw std::runtime_error("Undefined at operator+");
 //    return 0;
 }
-std::any operator-(std::any const &a1,std::any const &a2){
+std::any operator-(std::any const &a1, std::any const &a2){
     if (is_Number(a1) && is_Number(a2)){
         if (is_Double(a1) || is_Double(a2)){
             double tmp = to_Double(a1) + to_Double(a2);
@@ -146,7 +151,7 @@ std::any operator-(std::any const &a1,std::any const &a2){
     }
     throw std::runtime_error("Undefined at operator-");
 }
-std::any operator*(std::any const &a1,std::any const &a2){
+std::any operator*(std::any const &a1, std::any const &a2){
     if (is_Number(a1) && is_Number(a2)) {
         if (is_Double(a1) || is_Double(a2)){
             double tmp = to_Double(a1) * to_Double(a2);
@@ -171,9 +176,9 @@ std::any operator*(std::any const &a1,std::any const &a2){
     throw std::runtime_error("Undefined at operator*");
 }
 
-std::any operator/(std::any const &a1,std::any const &a2){
+std::any operator/(std::any const &a1, std::any const &a2){
     if (is_Number(a1) && is_Number(a2)){
-        double p= to_Double(a1) , q = to_Double(a2);
+        double p = to_Double(a1) , q = to_Double(a2);
         if (fabs(q)<(1e-10)) throw std::runtime_error("DIV0 at operator/");
         p = p / q;
         return p;
@@ -190,7 +195,7 @@ std::any operator-(std::any const &a1) {
 }
 
 //div & mod
-std::any DivInt(std::any const &a1,std::any const &a2){
+std::any DivInt(std::any const &a1, std::any const &a2){
     if (is_Number(a1) && is_Number(a2)){
         if (is_Double(a1) || is_Double(a2)){
             double n1 = to_Double(a1),n2 = to_Double(a2);
@@ -201,9 +206,9 @@ std::any DivInt(std::any const &a1,std::any const &a2){
     }
     throw std::runtime_error("Undefined at operator DivInt");
 }
-std::any DivDouble(std::any const &a1,std::any const &a2){
+std::any DivDouble(std::any const &a1, std::any const &a2){
     if (is_Number(a1) && is_Number(a2)){
-        double n1 = to_Double(a1),n2 = to_Double(a2);
+        double n1 = to_Double(a1), n2 = to_Double(a2);
         return n1 / n2;
     }
     throw std::runtime_error("Undefined at operator DivDouble");
@@ -234,7 +239,7 @@ std::any &operator%=(std::any &a1, std::any const &a2){
 //逻辑运算 not:返回bool  and/or:
 
 // 比较运算符
-bool operator==(std::any const &a1,std::any const &a2){
+bool operator==(std::any const &a1, std::any const &a2){
     //不同类型？
     if (is_None(a1) || is_None(a2)) return is_None(a1) && is_None(a2);
     if (is_Number(a1) && is_Number(a2)){
@@ -247,7 +252,7 @@ bool operator==(std::any const &a1,std::any const &a2){
     }
     return false;
 }
-bool operator<(std::any const &a1,std::any const &a2){
+bool operator<(std::any const &a1, std::any const &a2){
     if (is_Double(a1) && is_Double(a2)){
         return to_Double(a1) < to_Double(a2);
     }

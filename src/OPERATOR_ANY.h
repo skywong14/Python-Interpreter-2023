@@ -1,14 +1,16 @@
 //OPERATOR:any
+#pragma once
 #ifndef SKYW_ANY
 #define SKYW_ANY
-#pragma once
 #include <any>
 #include <iostream>
 #include <cmath>
 #include <cstring>
 #define Int long long
-
+//For debug only
+void Debug_output(std::string s);
 //供测试用
+
 double Int_to_Double(long long x);
 long long String_to_Int(std::string x);
 
@@ -60,5 +62,11 @@ enum class AugassignType{ //枚举augassign的类型
     equal,add,sub,mul,div,idiv,mod,none
 };
 
+enum class Flow_stmt{ //枚举Flow_stmt的类型
+    Flow_Return,Flow_Continue,Flow_Break
+};
 
+enum class Builtin{ //枚举Builtin的类型
+    builtin_Print,builtin_Int,builtin_Float,builtin_Str,builtin_Bool
+};
 #endif
