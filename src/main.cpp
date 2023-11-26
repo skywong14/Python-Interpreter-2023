@@ -8,7 +8,7 @@ using namespace antlr4;
 //       if you really need to regenerate,please ask TA for help.
 int main(int argc, const char *argv[]) {
 	// TODO: please don't modify the code below the construction of ifs if you want to use visitor mode
-    freopen("test1.in","r",stdin); //ATTENTION::FOR DEBUG ONL/Y
+//    freopen("test1.in","r",stdin); //ATTENTION::FOR DEBUG ONL/Y
 	ANTLRInputStream input(std::cin);
 	Python3Lexer lexer(&input);
 	CommonTokenStream tokens(&lexer);
