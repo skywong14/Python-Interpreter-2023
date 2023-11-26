@@ -156,9 +156,11 @@ std::string get_varName(std::any const &a){
 }
 
 //四则运算
-std::any operator+(std::any const &a1, std::any const &a2){
+std::any operator+(std::any const &any1, std::any const &any2){
+    std::any a1=any1, a2=any2;
+    release_Tuple(a1); release_Tuple(a2);
+    release_Var(a1); release_Var(a2);
     std::any a3;
-    //Int Double Bool运算时返回数字
     if (is_Number(a1) && is_Number(a2)){
         if (is_Double(a1) || is_Double(a2)){
             double tmp = to_Double(a1) + to_Double(a2);
@@ -176,7 +178,12 @@ std::any operator+(std::any const &a1, std::any const &a2){
         return a3;
     }
     if (is_Tuple(a1) && is_Tuple(a2)){
-        //待完成
+        std::vector<std::any> list1 = std::any_cast<std::vector<std::any>>(a1);
+        std::vector<std::any> list2 = std::any_cast<std::vector<std::any>>(a2);
+        for (int i = 0; i < list2.size(); i++)
+            list1.emplace_back(list2[i]);
+        a3=list1;
+        return a3;
     }
     //其他情况
     throw std::runtime_error("Undefined at operator+");
