@@ -76,7 +76,10 @@ std::any func_call(std::string Name, EvalVisitor &vis, Python3Parser::ArglistCon
             delete_Namespace();
             delete_Funcspace();
 
-            return ret;
+            if (is_FlowReturn(ret)) {
+                return std::any_cast<std::pair<Flow_stmt, std::any> >(ret).second;
+            }else
+                return ret;
         }
     }
 

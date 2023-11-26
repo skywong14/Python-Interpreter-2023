@@ -63,9 +63,9 @@ bool is_FlowContinue(std::any const &a){
     return false;
 }
 bool is_FlowReturn(std::any const &a){
-    auto ptr = std::any_cast<std::pair<Flow_stmt, std::any> >(&a);
-    if (ptr != nullptr){
-        return (std::any_cast<std::pair<Flow_stmt, std::any> >(a).first == Flow_stmt::Flow_Return);
+    if (std::any_cast<std::pair<Flow_stmt, std::any> >(&a) != nullptr){
+        std::pair<Flow_stmt, std::any> tmp = std::any_cast<std::pair<Flow_stmt, std::any> >(a);
+        return (tmp.first == Flow_stmt::Flow_Return);
     }
     return false;
 }

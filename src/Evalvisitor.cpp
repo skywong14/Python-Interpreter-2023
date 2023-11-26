@@ -46,10 +46,12 @@ std::any EvalVisitor::visitFlow_stmt(Python3Parser::Flow_stmtContext *ctx){
     if (ctx->break_stmt())
         return Flow_stmt::Flow_Break;
     if (ctx->return_stmt()){
-        std::any val = {};
+        std::vector<std::any> val = {};
         auto test_list = ctx->return_stmt()->testlist();
-        if (test_list) val = visitTestlist(test_list);
-        return std::make_pair(Flow_stmt::Flow_Return, val);
+        if (test_list)
+            val = std::any_cast<std::vector<std::any> >(visitTestlist(test_list));
+        std::any val2 = val;
+        return std::make_pair(Flow_stmt::Flow_Return, val2);
     }
     return visitChildren(ctx);
 }
@@ -170,7 +172,10 @@ std::any EvalVisitor::visitSimple_stmt(Python3Parser::Simple_stmtContext *ctx){
 }
 std::any EvalVisitor::visitSmall_stmt(Python3Parser::Small_stmtContext *ctx){
 //    Debug_output("Small_stmt");
-    return visitChildren(ctx);
+    if (ctx->flow_stmt()){
+        return visitFlow_stmt(ctx->flow_stmt());
+    }
+    return visitExpr_stmt(ctx->expr_stmt());
 }
 //suite
 std::any EvalVisitor::visitSuite(Python3Parser::SuiteContext *ctx){
@@ -186,8 +191,11 @@ std::any EvalVisitor::visitSuite(Python3Parser::SuiteContext *ctx){
             return Flow_stmt::Flow_Break;
         if (is_FlowContinue(st1))
             return Flow_stmt::Flow_Continue;
-        if (is_FlowReturn(st1))
-            return st1;
+        if (is_FlowReturn(st1)){
+            std::any val = (std::any_cast<std::pair<Flow_stmt, std::any> >(st1)).second;
+            release_Tuple(val);
+            return val;
+        }
     }
     return {};
 }
@@ -305,6 +313,7 @@ std::any EvalVisitor::visitTerm(Python3Parser::TermContext *ctx){
     release_Tuple(now_v);
     for (int i = 0; i < ctx2.size(); i++){
         tmp = visitFactor(ctx1[i+1]);
+        release_Tuple(tmp);//update
         release_Var(tmp);
         //QUESTION:会返回(VarType)吗？
         if (ctx2[i]->STAR())
@@ -359,7 +368,7 @@ std::any EvalVisitor::visitAtom_expr(Python3Parser::Atom_exprContext *ctx){
         std::any val_atom = visitAtom(ctx->atom());
         release_Var(val_atom);
         std::string Name = to_String( val_atom );
-        return func_call(Name, *this, ctx->trailer()->arglist());
+        return func_call(Name, *this, ctx->trailer()->arglist()); //return vector?
     }else{
         Debug_output("Atom_expr::atom");
         std::any val = visitAtom(ctx->atom());
