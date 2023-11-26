@@ -200,7 +200,7 @@ std::any EvalVisitor::visitSuite(Python3Parser::SuiteContext *ctx){
     return {};
 }
 
-//Or_test  && And_test
+//Or_test && And_test
 std::any EvalVisitor::visitOr_test(Python3Parser::Or_testContext *ctx){
     if (ctx->OR(0)){
 //        Debug_output("Or_test");
