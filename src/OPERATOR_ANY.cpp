@@ -7,7 +7,7 @@
 #define Int long long
 //For debug only
 void Debug_output(std::string s){
-    std::cout<<s<<std::endl;
+//    std::cout<<s<<std::endl;
 }
 //供测试用
 double Int_to_Double(long long x){
@@ -20,11 +20,6 @@ long long String_to_Int(std::string x){
         ans = ans * 10 + x[i] - 48;
     }
     return ans;
-}
-
-//关于变量
-bool is_variable(std::any const &a){
-    return (std::any_cast<std::pair<std::string, std::any> >(&a) != nullptr);
 }
 
 //判断类型
@@ -74,6 +69,7 @@ bool is_FlowReturn(std::any const &a){
     }
     return false;
 }
+//关于变量
 bool is_Var(std::any const &a){
     return (std::any_cast<std::pair<std::string, std::any>>(&a));
 }
@@ -126,10 +122,6 @@ double to_Double(std::any const &a){
 }
 std::string to_String(std::any const &a){
     if (is_String(a)) return (std::string)std::any_cast<std::string>(a);
-    //FOR DEBUG ONLY!!!
-    const std::type_info& typeInfo = a.type();
-    std::cout << "Value type: " << typeInfo.name() << std::endl;
-
     throw std::runtime_error("Invalid type at to_String");
 }
 bool to_Bool(std::any const &a){
