@@ -5,12 +5,6 @@
 #define Int sjtu::int2048
 
 //函数部分
-/*
-funcdef: 'def' NAME parameters ':' suite;
-parameters: '(' typedargslist? ')';
-typedargslist: (tfpdef ('=' test)? (',' tfpdef ('=' test)?)*);
-tfpdef: NAME ;
-*/
 std::any EvalVisitor::visitParameters(Python3Parser::ParametersContext *ctx){
     std::vector<std::pair<std::string, std::any> > Arglist_init;
     Arglist_init.clear();
