@@ -120,6 +120,10 @@ double to_Double(std::any const &a){
 }
 std::string to_String(std::any const &a){
     if (is_String(a)) return (std::string)std::any_cast<std::string>(a);
+    //FOR DEBUG ONLY!!!
+    const std::type_info& typeInfo = a.type();
+    std::cout << "Value type: " << typeInfo.name() << std::endl;
+
     throw std::runtime_error("Invalid type at to_String");
 }
 bool to_Bool(std::any const &a){

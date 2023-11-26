@@ -13,7 +13,6 @@ typedargslist: (tfpdef ('=' test)? (',' tfpdef ('=' test)?)*);
 tfpdef: NAME ;
 */
 std::any EvalVisitor::visitParameters(Python3Parser::ParametersContext *ctx){
-    //TODO
     std::vector<std::pair<std::string, std::any> > Arglist_init;
     Arglist_init.clear();
     if (!ctx->typedargslist())
@@ -132,15 +131,15 @@ std::any EvalVisitor::visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx){
         for (int i = 0; i < left_v_num; i++){
             std::vector<std::any> left_v = std::any_cast<std::vector<std::any> >(visitTestlist(ctx1[i]));
             if (left_v.size() == 1){
+                Debug_output("____LEFT_V==1____");
                 Variable_name = to_String(left_v[0]);
                 set_Variable(Variable_name, right_v_all);
-                Debug_output("____LEFT_V==1____");
             }else{
+                Debug_output("____LEFT_V==TUPLE____");
                 for (int j = 0; j < left_v_num; j++){
                     Variable_name = to_String(left_v[j]);
                     set_Variable(Variable_name, right_v[j]);
                 }
-                Debug_output("____LEFT_V==TUPLE____");
             }
         }
     }
@@ -316,12 +315,14 @@ std::any EvalVisitor::visitAugassign(Python3Parser::AugassignContext *ctx){
 
 //Factor 正负号
 std::any EvalVisitor::visitFactor(Python3Parser::FactorContext *ctx){
+    if (ctx->atom_expr())
+        return visitAtom_expr(ctx->atom_expr());
     Debug_output("Factor");
-    std::any inside = visitChildren(ctx);
+    std::any inside = visitFactor(ctx->factor());
+    release_Var(inside);
     if (ctx->MINUS()){
         inside = -inside;
     }
-//    if (is_String(inside)) Debug_output("FACTOR::IS STRING");
     return inside;
 }
 
@@ -335,7 +336,6 @@ std::any EvalVisitor::visitAtom_expr(Python3Parser::Atom_exprContext *ctx){
         Debug_output("Atom_expr::atom");
         std::any val = visitAtom(ctx->atom());
         release_Var(val);
-//        if (is_String(val)) Debug_output("Atom_expr::atom::IS STRING");
         return val;
     }
 }
@@ -345,10 +345,12 @@ std::any EvalVisitor::visitAtom(Python3Parser::AtomContext *ctx){
         //如果不在变量lst内，就返回原来内容
         std::string str = ctx->NAME()->getText();
         Debug_output("Atom::Name::"+str);
-        if (search_Scope(str).first != null_Scope() )
+        if (search_Scope(str).first != null_Scope() ){
             return get_Value( str );
-        else
+        }
+        else{
             return str;
+        }
     }
     Debug_output("Atom-Not NAME");
     if (ctx->NUMBER()){
@@ -384,7 +386,6 @@ std::any EvalVisitor::visitTestlist(Python3Parser::TestlistContext *ctx){
     vars.clear();
     for (int i = 0; auto ctx2 = ctx->test(i); i++){
         std::any res = visitTest(ctx2);
-        //我猜Test返回都是string？
         //Tuple或单个元素
         if (is_Tuple(res)){
             std::vector<std::any> vars2 = std::any_cast<std::vector<std::any>>(res);
@@ -392,7 +393,7 @@ std::any EvalVisitor::visitTestlist(Python3Parser::TestlistContext *ctx){
                 vars.emplace_back( vars2[i] );
             //TLE:使用vector的insert?
         }else{
-            vars.emplace_back(std::move(res));
+            vars.emplace_back(res); //TLE:改为move？
         }
     }
     return vars;

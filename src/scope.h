@@ -1,6 +1,7 @@
 //
 // Created by skywa on 2023/11/23.
 //
+//TODO 把变量传递改为常量引用
 #pragma once
 #include "Evalvisitor.h"
 #ifndef PYTHON_INTERPRETER_SCOPE_H
@@ -16,19 +17,14 @@ std::any builtin_Int_call(EvalVisitor &vis, Python3Parser::ArglistContext *ctx);
 std::any builtin_Float_call(EvalVisitor &vis, Python3Parser::ArglistContext *ctx);
 std::any builtin_Str_call(EvalVisitor &vis, Python3Parser::ArglistContext *ctx);
 std::any builtin_Bool_call(EvalVisitor &vis, Python3Parser::ArglistContext *ctx);
-std::any builtin_Print_call(EvalVisitor &vis, Python3Parser::ArglistContext *ctx);//TODO
+std::any builtin_Print_call(EvalVisitor &vis, Python3Parser::ArglistContext *ctx);
 //函数空间
 typedef std::pair< std::vector<std::pair<std::string, std::any> >, Python3Parser::SuiteContext* > func_info;
 struct func_NameSpace{
-    //TODO
     std::map<std::string, func_info > Names;
     func_NameSpace(){
         Names.clear();
     }
-//    func_NameSpace(std::string str1, func_info a1){
-//        Names.clear();
-//        Names[str1]=a1;
-//    }
 };
 typedef std::vector<func_NameSpace>::iterator func_Scope_it;
 typedef std::map<std::string, std::any>::iterator Names_it;
