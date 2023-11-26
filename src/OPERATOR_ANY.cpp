@@ -3,16 +3,25 @@
 #include <any>
 #include <iomanip>
 #include "OPERATOR_ANY.h"
+//#include "Bigint.h"
 #include <vector>
-#define Int long long
+#define Int sjtu::int2048
 //For debug only
 void Debug_output(std::string s){
 //    std::cout<<s<<std::endl;
 }
 //供测试用
+double Int_to_Double(Int x){
+    return x.sjtu::int2048::int2048_to_Double();
+}
 double Int_to_Double(long long x){
     return (double)x;
 }
+Int String_to_Int(std::string x){
+    sjtu::int2048 ans(x);
+    return ans;
+}
+/*
 long long String_to_Int(std::string x){
     int len = x.length();
     long long ans=0;
@@ -20,7 +29,7 @@ long long String_to_Int(std::string x){
         ans = ans * 10 + x[i] - 48;
     }
     return ans;
-}
+}*/
 
 //判断类型
 
@@ -214,13 +223,13 @@ std::any operator*(std::any const &any1, std::any const &any2){
     if (is_Integer(a1) && is_String(a2)){
         Int tmp = to_Int(a1);
         std::string s1 = "", s2 = to_String(a2); //Question:why warning?
-        for (Int i = 1; i <= tmp; i++) s1 += s2;
+        for (int i = 1; i <= tmp; i++) s1 += s2;
         return s1;
     }
     if (is_Integer(a2) && is_String(a1)){
         Int tmp = to_Int(a2);
         std::string s1 = "",s2 = to_String(a1); //Question:why warning?
-        for (Int i = 1; i <= tmp; i++) s1 += s2;
+        for (int i = 1; i <= tmp; i++) s1 += s2;
         return s1;
     }//TLE
 //    std::cout<<a1<<','<<a2<<std::endl;

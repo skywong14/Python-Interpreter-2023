@@ -2,6 +2,7 @@
 #include "Evalvisitor.h"
 #include "OPERATOR_ANY.h"
 #include "scope.h"
+#define Int sjtu::int2048
 
 
 
