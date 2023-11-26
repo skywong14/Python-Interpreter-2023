@@ -16,7 +16,7 @@ double Int_to_Double(long long x){
 long long String_to_Int(std::string x){
     int len = x.length();
     long long ans=0;
-    for (int i = len - 1; i >= 0; i--){
+    for (int i = 0; i < len; i++){
         ans = ans * 10 + x[i] - 48;
     }
     return ans;
@@ -82,7 +82,7 @@ void release_Tuple(std::any &a){ //把(var)释放成var
     //ATTENTION:()也是Tuple，而不是None
     std::vector<std::any>* ptr1=std::any_cast<std::vector<std::any> >(&a);
     if (!ptr1) return;//Tuple()
-    Debug_output("IS TUPLE");
+//    Debug_output("IS TUPLE");
     if (ptr1->size() == 1) {
         a = (*ptr1)[0];
         release_Tuple(a);
@@ -94,11 +94,14 @@ void release_Tuple(std::any &a){ //把(var)释放成var
 
 //类型转换
 Int to_Int(std::any const &a){
+    if (is_Int(a)){
+        Int val = std::any_cast<Int>(a);
+        return val;
+    }
     if (is_Bool(a)) {
         if (std::any_cast<bool>(a)) return 1;
         return 0;
     }
-    if (is_Int(a)) return (std::any_cast<Int>(a));
     if (is_Double(a)){
         //ATTENEION:python中取整方式是否不同？
         long long tmp = (long long)std::any_cast<double>(a);

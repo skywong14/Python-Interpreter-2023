@@ -76,20 +76,21 @@ antlrcpp::Any EvalVisitor::visitWhile_stmt(Python3Parser::While_stmtContext *ctx
     Debug_output("While_stmt::");
     auto judge_test = ctx->test();
     auto suites = ctx->suite();
-    std::any val = visitTest(judge_test);
-    release_Var(val);
-    while (to_Bool(val)){
-//        std::cout<<to_Bool(val)<<"!!!\n";
+    std::any val_judge = visitTest(judge_test);
+    release_Var(val_judge);
+    while (to_Bool(val_judge)){
         Debug_output("_____In the while____");
-        std::any val = visitSuite(suites);
-        if (is_FlowBreak(val))
+
+        std::any execute = visitSuite(suites);
+
+        if (is_FlowBreak(execute))
             break;
-        if (is_FlowReturn(val))
-            return val;
-        val = visitTest(judge_test);
-        release_Var(val);
-        if (!to_Bool(val)) break; //TODO what happened here????
-//        std::cout<<to_Bool(val)<<"???\n";
+        if (is_FlowReturn(execute))
+            return execute;
+
+        val_judge = visitTest(judge_test);
+        val_judge = visitTest(ctx->test());
+        release_Var(val_judge);
     }
     return {};
 }
@@ -143,13 +144,12 @@ std::any EvalVisitor::visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx){
         for (int i = 0; i < left_v_num; i++){
             std::vector<std::any> left_v = std::any_cast<std::vector<std::any> >(visitTestlist(ctx1[i]));
             if (left_v.size() == 1){
-                Debug_output("____LEFT_V==1____");
                 Variable_name = get_varName(left_v[0]);
                 Debug_output("____LEFT_V==1___NAME::"+Variable_name);
                 set_Variable(Variable_name, right_v_all);
             }else{
                 Debug_output("____LEFT_V==TUPLE____");
-                for (int j = 0; j < left_v_num; j++){
+                for (int j = 0; j < left_v.size(); j++){
                     Variable_name = get_varName(left_v[j]);
                     set_Variable(Variable_name, right_v[j]);
                 }
@@ -161,11 +161,11 @@ std::any EvalVisitor::visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx){
 }
 //stmt操作
 std::any EvalVisitor::visitSimple_stmt(Python3Parser::Simple_stmtContext *ctx){
-    Debug_output("Simple_stmt");
+//    Debug_output("Simple_stmt");
     return visitSmall_stmt(ctx->small_stmt());
 }
 std::any EvalVisitor::visitSmall_stmt(Python3Parser::Small_stmtContext *ctx){
-    Debug_output("Small_stmt");
+//    Debug_output("Small_stmt");
     return visitChildren(ctx);
 }
 //suite
@@ -191,7 +191,7 @@ std::any EvalVisitor::visitSuite(Python3Parser::SuiteContext *ctx){
 //Or_test  && And_test
 std::any EvalVisitor::visitOr_test(Python3Parser::Or_testContext *ctx){
     if (ctx->OR(0)){
-        Debug_output("Or_test");
+//        Debug_output("Or_test");
         std::vector<Python3Parser::And_testContext *> andtext = ctx->and_test();
         for (auto it = andtext.begin(); it != andtext.end(); it++){
             std::any val = visitAnd_test((*it));
@@ -208,7 +208,7 @@ std::any EvalVisitor::visitOr_test(Python3Parser::Or_testContext *ctx){
 }
 std::any EvalVisitor::visitAnd_test(Python3Parser::And_testContext *ctx){
     if (ctx->AND(0)){
-        Debug_output("And_test");
+//        Debug_output("And_test");
         std::vector<Python3Parser::Not_testContext *> nottext = ctx->not_test();
         for (auto it = nottext.begin(); it != nottext.end(); it++){
             std::any val = visitNot_test((*it));
@@ -225,7 +225,7 @@ std::any EvalVisitor::visitAnd_test(Python3Parser::And_testContext *ctx){
 }
 std::any EvalVisitor::visitNot_test(Python3Parser::Not_testContext *ctx){
     if (ctx->NOT()){
-        Debug_output("Not_test");
+//        Debug_output("Not_test");
         std::any val = visitNot_test(ctx->not_test()); //TLE:可以&&改为传输右值
         release_Var(val);
         release_Tuple(val);
@@ -242,24 +242,26 @@ std::any EvalVisitor::visitComparison(Python3Parser::ComparisonContext *ctx){
         auto ctx2 = ctx->comp_op();
 
         std::any left_v = visitArith_expr(ctx1[0]),right_v;
+        release_Tuple(left_v);
         release_Var(left_v);
         bool flag=true;
         for (int i = 0; i < ctx2.size(); i++){
             right_v = visitArith_expr(ctx1[i + 1]);
+            release_Tuple(right_v);
             release_Var(right_v);
             auto *const op1 = ctx2[i]; //QUESTION:why *const?
             if (op1->EQUALS())
-                flag = left_v == right_v;
+                flag = (left_v == right_v);
             else if (op1->LESS_THAN())
-                flag = left_v < right_v;
+                flag = (left_v < right_v);
             else if (op1->GREATER_THAN())
-                flag = left_v > right_v;
+                flag = (left_v > right_v);
             else  if (op1->GT_EQ())
-                flag = left_v >= right_v;
+                flag = (left_v >= right_v);
             else if (op1->LT_EQ())
-                flag = left_v <= right_v;
+                flag = (left_v <= right_v);
             else if (op1->NOT_EQ_2())
-                flag = left_v != right_v;
+                flag = (left_v != right_v);
 
             if (!flag) return false;
             left_v = right_v; //TLE: Move()?
@@ -271,11 +273,11 @@ std::any EvalVisitor::visitComparison(Python3Parser::ComparisonContext *ctx){
 }
 //算术运算
 std::any EvalVisitor::visitArith_expr(Python3Parser::Arith_exprContext *ctx){
-    Debug_output("Arith_expr");
     auto ctx1 = ctx->term();
     auto ctx2 = ctx->addorsub_op();
     std::any now_v = visitTerm(ctx1[0]), tmp;
     if (ctx2.empty()) return now_v;
+    Debug_output("Arith_expr");
     release_Var(now_v);
     release_Tuple(now_v);
     for (int i = 0; i < ctx2.size(); i++){
@@ -365,6 +367,7 @@ std::any EvalVisitor::visitAtom(Python3Parser::AtomContext *ctx){
     if (ctx->NAME()){
         //如果不在变量lst内，就返回原来内容
         std::string str = ctx->NAME()->getText();
+        Debug_output("Atom-NAME::"+str);
         if (search_Scope(str).first != null_Scope() ){
             return std::make_pair(str, get_Value( str )); //函数名+函数值
         }else{
@@ -393,7 +396,6 @@ std::any EvalVisitor::visitAtom(Python3Parser::AtomContext *ctx){
         auto str_list = ctx->STRING();
         std::string str = str_list[0]->getText();
         str = str.substr(1, str.size() - 2);
-        Debug_output("ATOM::STRING "+str);
         return str;
     }
 }
