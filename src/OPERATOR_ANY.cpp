@@ -185,7 +185,9 @@ std::any operator+(std::any const &a1, std::any const &a2){
     throw std::runtime_error("Undefined at operator+");
 //    return 0;
 }
-std::any operator-(std::any const &a1, std::any const &a2){
+std::any operator-(std::any const &any1, std::any const &any2){
+    std::any a1=any1, a2=any2;
+    release_Var(a1); release_Var(a2);
     if (is_Number(a1) && is_Number(a2)){
         if (is_Double(a1) || is_Double(a2)){
             double tmp = to_Double(a1) - to_Double(a2);
@@ -197,7 +199,9 @@ std::any operator-(std::any const &a1, std::any const &a2){
     }
     throw std::runtime_error("Undefined at operator-");
 }
-std::any operator*(std::any const &a1, std::any const &a2){
+std::any operator*(std::any const &any1, std::any const &any2){
+    std::any a1=any1, a2=any2;
+    release_Var(a1); release_Var(a2);
     if (is_Number(a1) && is_Number(a2)) {
         if (is_Double(a1) || is_Double(a2)){
             double tmp = to_Double(a1) * to_Double(a2);
@@ -209,7 +213,7 @@ std::any operator*(std::any const &a1, std::any const &a2){
     }
     if (is_Integer(a1) && is_String(a2)){
         Int tmp = to_Int(a1);
-        std::string s1 = "",s2 = to_String(a2); //Question:why warning?
+        std::string s1 = "", s2 = to_String(a2); //Question:why warning?
         for (Int i = 1; i <= tmp; i++) s1 += s2;
         return s1;
     }
@@ -218,7 +222,8 @@ std::any operator*(std::any const &a1, std::any const &a2){
         std::string s1 = "",s2 = to_String(a1); //Question:why warning?
         for (Int i = 1; i <= tmp; i++) s1 += s2;
         return s1;
-    }//TLE:可以加速
+    }//TLE
+//    std::cout<<a1<<','<<a2<<std::endl;
     throw std::runtime_error("Undefined at operator*");
 }
 
@@ -241,7 +246,9 @@ std::any operator-(std::any const &a1) {
 }
 
 //div & mod
-std::any DivInt(std::any const &a1, std::any const &a2){
+std::any DivInt(std::any const &any1, std::any const &any2){
+    std::any a1=any1, a2=any2;
+    release_Var(a1); release_Var(a2);
     if (is_Number(a1) && is_Number(a2)){
         if (is_Double(a1) || is_Double(a2)){
             double n1 = to_Double(a1),n2 = to_Double(a2);

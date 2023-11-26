@@ -106,6 +106,10 @@ std::any EvalVisitor::visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx){
     int right_size = right_v.size();
     for (int i = 0; i < right_size; i++)
         release_Var(right_v[i]);
+    if (right_size == 1 && std::any_cast<std::vector<std::any> >(&right_v[0])){
+        std::vector<std::any> expand_r = std::any_cast<std::vector<std::any> >(right_v[0]);
+        right_v = expand_r;
+    }
     std::any right_v_all = right_v;
     release_Tuple(right_v_all);
     //ATTENTION: visitTestlist返回一个vector！！！(release后如果是单个元素，加上一层）
