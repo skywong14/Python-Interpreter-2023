@@ -7,13 +7,38 @@
 
 //函数部分
 /*
- file_input: (NEWLINE | stmt)* EOF;
 funcdef: 'def' NAME parameters ':' suite;
 parameters: '(' typedargslist? ')';
 typedargslist: (tfpdef ('=' test)? (',' tfpdef ('=' test)?)*);
 tfpdef: NAME ;
 */
-
+std::any EvalVisitor::visitParameters(Python3Parser::ParametersContext *ctx){
+    //TODO
+    std::vector<std::pair<std::string, std::any> > Arglist_init;
+    Arglist_init.clear();
+    if (!ctx->typedargslist())
+        return Arglist_init;
+    auto types = ctx->typedargslist()->tfpdef();
+    auto init_vals = ctx->typedargslist()->test();
+    int no_val = types.size() - init_vals.size();
+    for (int i = 0; i < types.size(); i++){
+        std::string Variable_name = types[i]->NAME()->getText();
+        std::any Variable_val = {};
+        if (i >= no_val)
+            Variable_val = visitTest(init_vals[i - no_val]);
+        Arglist_init.emplace_back(make_pair(Variable_name, Variable_val));
+    }
+    return Arglist_init;
+}
+std::any EvalVisitor::visitFuncdef(Python3Parser::FuncdefContext *ctx){
+    Debug_output("__FuncDefine__");
+    std::string func_Name = ctx->NAME()->getText();
+    //visitParameters返回vector
+    std::vector<std::pair<std::string, std::any> > Arglists =
+            std::any_cast<std::vector<std::pair<std::string, std::any> >>(visitParameters(ctx->parameters()));
+    func_Define(func_Name, Arglists, ctx->suite());
+    return {};
+}
 
 //三种FLOW-stmt
 std::any EvalVisitor::visitFlow_stmt(Python3Parser::Flow_stmtContext *ctx){
@@ -31,12 +56,12 @@ std::any EvalVisitor::visitFlow_stmt(Python3Parser::Flow_stmtContext *ctx){
 }
 //IF WHILE
 
-std::any EvalVisitor::visitIf_stmt(Python3Parser::If_stmtContext *ctx) {
+std::any EvalVisitor::visitIf_stmt(Python3Parser::If_stmtContext *ctx){
     Debug_output("If_stmt::");
     auto tests = ctx->test();
     auto suites = ctx->suite();
     //If && else if
-    for (int i = 0; i < tests.size(); i++) {
+    for (int i = 0; i < tests.size(); i++){
         if (to_Bool(visitTest(tests[i])))
             return visitSuite(suites[i]);
     }
@@ -46,11 +71,11 @@ std::any EvalVisitor::visitIf_stmt(Python3Parser::If_stmtContext *ctx) {
     return {};
 }
 
-antlrcpp::Any EvalVisitor::visitWhile_stmt(Python3Parser::While_stmtContext *ctx) {
+antlrcpp::Any EvalVisitor::visitWhile_stmt(Python3Parser::While_stmtContext *ctx){
     Debug_output("While_stmt::");
     auto judge_test = ctx->test();
     auto suites = ctx->suite();
-    while (to_Bool(visitTest(judge_test))) {
+    while (to_Bool(visitTest(judge_test))){
         Debug_output("_____In the while____");
         std::any val = visitSuite(suites);
         if (is_FlowBreak(val))
@@ -84,20 +109,20 @@ std::any EvalVisitor::visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx){
         Variable_it ptr = search_Scope(Variable_name);
         std::any val =  (ptr.second)->second;
         std::any sol;
-        if (opt == "+=") {
+        if (opt == "+="){
             sol = val + right_v_all;
-        } else if (opt == "-=") {
+        } else if (opt == "-="){
             sol = val - right_v_all;
-        } else if (opt == "*=") {
+        } else if (opt == "*="){
             sol = val * right_v_all;
-        } else if (opt == "/=") {
+        } else if (opt == "/="){
             sol = val / right_v_all;
-        } else if (opt == "//=") {
+        } else if (opt == "//="){
             if (is_Integer(val) && is_Integer(right_v_all))
                 sol = DivInt(val, right_v_all);
             else
                 sol = DivDouble(val, right_v_all);
-        } else if (opt == "%=") {
+        } else if (opt == "%="){
             sol = val % right_v_all;
         }
         set_Variable(Variable_name, sol);
@@ -158,7 +183,7 @@ std::any EvalVisitor::visitOr_test(Python3Parser::Or_testContext *ctx){
     if (ctx->OR(0)){
         Debug_output("Or_test");
         std::vector<Python3Parser::And_testContext *> andtext = ctx->and_test();
-        for (auto it = andtext.begin(); it != andtext.end(); it++) {
+        for (auto it = andtext.begin(); it != andtext.end(); it++){
             std::any val = visitAnd_test((*it));
             release_Var(val);
             if (to_Bool(val))
@@ -174,7 +199,7 @@ std::any EvalVisitor::visitAnd_test(Python3Parser::And_testContext *ctx){
     if (ctx->AND(0)){
         Debug_output("And_test");
         std::vector<Python3Parser::Not_testContext *> nottext = ctx->not_test();
-        for (auto it = nottext.begin(); it != nottext.end(); it++) {
+        for (auto it = nottext.begin(); it != nottext.end(); it++){
             std::any val = visitNot_test((*it));
             release_Var(val);
             if (!to_Bool(val))
@@ -197,8 +222,8 @@ std::any EvalVisitor::visitNot_test(Python3Parser::Not_testContext *ctx){
     }
 }
 //比较
-std::any EvalVisitor::visitComparison(Python3Parser::ComparisonContext *ctx) {
-    if (ctx->comp_op(0)) {
+std::any EvalVisitor::visitComparison(Python3Parser::ComparisonContext *ctx){
+    if (ctx->comp_op(0)){
         Debug_output("Comparison");
         auto ctx1 = ctx->arith_expr();
         auto ctx2 = ctx->comp_op();
@@ -271,7 +296,7 @@ std::any EvalVisitor::visitTerm(Python3Parser::TermContext *ctx){
 }
 
 //函数操作
-std::any EvalVisitor::visitAugassign(Python3Parser::AugassignContext *ctx) {
+std::any EvalVisitor::visitAugassign(Python3Parser::AugassignContext *ctx){
     Debug_output("Augassign");
     if (ctx->ADD_ASSIGN())
         return AugassignType::add;
@@ -293,7 +318,7 @@ std::any EvalVisitor::visitAugassign(Python3Parser::AugassignContext *ctx) {
 std::any EvalVisitor::visitFactor(Python3Parser::FactorContext *ctx){
     Debug_output("Factor");
     std::any inside = visitChildren(ctx);
-    if (ctx->MINUS()) {
+    if (ctx->MINUS()){
         inside = -inside;
     }
 //    if (is_String(inside)) Debug_output("FACTOR::IS STRING");
@@ -357,7 +382,7 @@ std::any EvalVisitor::visitAtom(Python3Parser::AtomContext *ctx){
 std::any EvalVisitor::visitTestlist(Python3Parser::TestlistContext *ctx){
     std::vector<std::any> vars;
     vars.clear();
-    for (int i = 0; auto ctx2 = ctx->test(i); i++) {
+    for (int i = 0; auto ctx2 = ctx->test(i); i++){
         std::any res = visitTest(ctx2);
         //我猜Test返回都是string？
         //Tuple或单个元素
@@ -373,7 +398,7 @@ std::any EvalVisitor::visitTestlist(Python3Parser::TestlistContext *ctx){
     return vars;
 }
 
-std::any EvalVisitor::visitArglist(Python3Parser::ArglistContext *ctx) {
+std::any EvalVisitor::visitArglist(Python3Parser::ArglistContext *ctx){
     auto ctx1 = ctx->argument();
     std::vector<std::any> ret_array;
     ret_array.clear();

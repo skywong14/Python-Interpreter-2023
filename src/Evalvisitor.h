@@ -11,9 +11,9 @@ class EvalVisitor : public Python3ParserBaseVisitor {
 public:
 //    virtual std::any visitFile_input(Python3Parser::File_inputContext *ctx) override;
 
-//    virtual std::any visitFuncdef(Python3Parser::FuncdefContext *ctx) override;
+    virtual std::any visitFuncdef(Python3Parser::FuncdefContext *ctx) override;
 
-//    virtual std::any visitParameters(Python3Parser::ParametersContext *ctx) override;
+    virtual std::any visitParameters(Python3Parser::ParametersContext *ctx) override;
 
 //    virtual std::any visitStmt(Python3Parser::StmtContext *ctx) override;
 

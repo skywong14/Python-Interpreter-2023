@@ -4,9 +4,11 @@
 #pragma once
 #include "OPERATOR_ANY.h"
 #include "scope.h"
+#include "Evalvisitor.h"
 #include <iostream>
 //函数部分
-std::vector<func_NameSpace> func_scope;
+func_NameSpace empty_funcspace;
+std::vector<func_NameSpace> func_scope = {empty_funcspace};
 std::any builtin_Int_call(EvalVisitor &vis, Python3Parser::ArglistContext *ctx){
     return to_Int(vis.visit(ctx));
 }
@@ -33,10 +35,11 @@ std::any builtin_Print_call(EvalVisitor &vis, Python3Parser::ArglistContext *ctx
     return {};
 }
 
-Variable_it search_Built_in(std::string Name){
-    //TODO
+void func_Define(std::string Name, std::vector<std::pair<std::string, std::any> >Arglists, Python3Parser::SuiteContext *ctx){
+    func_scope.back().Names[Name] = std::make_pair(Arglists, ctx);
 }
 
+//call分三步：创建变量和函数空间并初始化，执行suite，销毁空间
 std::any func_call(std::string Name, EvalVisitor &vis, Python3Parser::ArglistContext *ctx){
     Debug_output("Function_call::"+Name);
     auto func_scope_it = func_scope.end();
@@ -44,9 +47,23 @@ std::any func_call(std::string Name, EvalVisitor &vis, Python3Parser::ArglistCon
         func_scope_it--;
         auto find_it = (*func_scope_it).Names.find(Name);
         if ( find_it != (*func_scope_it).Names.end()) {
-            return {};//TODO
+
+            std::vector<std::pair<std::string, std::any> > Arglists_init = (*find_it).second.first;
+
+            new_Namespace(Arglists_init);
+            new_Funcspace();
+
+            Python3Parser::SuiteContext *func_ctx = (*find_it).second.second;
+            std::any ret = vis.visitSuite(func_ctx);
+
+            delete_Namespace();
+            delete_Funcspace();
+
+            return ret;//TODO
         }
     }
+
+
     //在built_in中查找Name
     if (Name == "print"){
         return builtin_Print_call(vis, ctx);
@@ -62,7 +79,14 @@ std::any func_call(std::string Name, EvalVisitor &vis, Python3Parser::ArglistCon
         throw std::runtime_error("THE FUNCTION MIGHT NOT BE DEFINED");
 }
 
+void new_Funcspace(){
+    func_scope.push_back(empty_funcspace);
+}
+void delete_Funcspace(){
+    func_scope.pop_back();
+}
 
+//----------------------------------
 
 //变量部分
 NameSpace empty_namespace;
@@ -105,13 +129,20 @@ Variable_it search_Scope(Scope_it it_Scope, std::string var_Name){
         return search_Scope(it_Scope, var_Name);
     }
 }
-Variable_it new_Namespace(std::string var_Name, std::any value){
-    //TODO
-    NameSpace new_space(var_Name, value);
+Variable_it new_Namespace(std::vector<std::pair<std::string, std::any> >Arglists){
+    NameSpace new_space;
+    std::string Name;
+    for (int i = 0; i < Arglists.size(); i++){
+        Name = Arglists[i].first;
+        new_space.Names[Name] = Arglists[i].second;
+    }
     scope.push_back(new_space);
     auto it = scope.end();
     it--;
     return std::make_pair(it, (*it).Names.begin());
+}
+void delete_Namespace(){
+    scope.pop_back();
 }
 std::any get_Value(std::string Name){
     Variable_it ptr = search_Scope( scope.end(), Name);

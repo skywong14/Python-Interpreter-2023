@@ -68,8 +68,4 @@ enum class AugassignType{ //枚举augassign的类型
 enum class Flow_stmt{ //枚举Flow_stmt的类型
     Flow_Return,Flow_Continue,Flow_Break
 };
-
-enum class Builtin{ //枚举Builtin的类型
-    builtin_Print,builtin_Int,builtin_Float,builtin_Str,builtin_Bool
-};
 #endif
