@@ -10,26 +10,14 @@
 void Debug_output(std::string s){
 //    std::cout<<s<<std::endl;
 }
-//供测试用
+
 double Int_to_Double(Int x){
-    return x.sjtu::int2048::int2048_to_Double();
-}
-double Int_to_Double(long long x){
-    return (double)x;
+    return x.int2048_to_Double();
 }
 Int String_to_Int(std::string x){
     sjtu::int2048 ans(x);
     return ans;
 }
-/*
-long long String_to_Int(std::string x){
-    int len = x.length();
-    long long ans=0;
-    for (int i = 0; i < len; i++){
-        ans = ans * 10 + x[i] - 48;
-    }
-    return ans;
-}*/
 
 //判断类型
 

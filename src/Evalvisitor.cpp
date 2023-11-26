@@ -4,8 +4,6 @@
 #include "scope.h"
 #define Int sjtu::int2048
 
-
-
 //函数部分
 /*
 funcdef: 'def' NAME parameters ':' suite;

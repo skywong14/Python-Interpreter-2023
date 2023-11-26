@@ -74,8 +74,6 @@ namespace sjtu {
         int2048 &operator-=(const int2048 &other);
         friend int2048 operator-(int2048 n1, const int2048 &n2);
 
-
-
         int2048 &operator*=(const int2048 &other);
         friend int2048 operator*(int2048 n1, const int2048 &n2);
 
@@ -92,7 +90,6 @@ namespace sjtu {
         int2048 &operator %=(const int2048 &other);
         friend int2048 operator % (int2048 n1, const int2048 &n2);
         friend std::ostream &operator<<(std::ostream &out, const int2048 &n1);
-
 
         friend bool operator==(const int2048 &n1, const int2048 &n2);
         friend bool operator!=(const int2048 &n1, const int2048 &n2);

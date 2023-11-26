@@ -488,7 +488,7 @@ namespace sjtu {
         double int2048::int2048_to_Double(){
             int2048 x(*this);
             double ans=0;
-            for (int i = static_cast<int>(x.num.size())-1; i; i--){
+            for (int i = static_cast<int>(x.num.size())-1; i>=0; i--){
                 ans = ans * base + (double)x.num[i];
             }
             if (!x.flag) return -ans;
