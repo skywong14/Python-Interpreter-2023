@@ -10,16 +10,24 @@
 func_NameSpace empty_funcspace;
 std::vector<func_NameSpace> func_scope = {empty_funcspace};
 std::any builtin_Int_call(EvalVisitor &vis, Python3Parser::ArglistContext *ctx){
-    return to_Int(vis.visit(ctx));
+    std::any val = vis.visitArglist(ctx);
+    release_Tuple(val);
+    return to_Int(val);
 }
 std::any builtin_Float_call(EvalVisitor &vis, Python3Parser::ArglistContext *ctx){
-    return to_Double(vis.visit(ctx));
+    std::any val = vis.visitArglist(ctx);
+    release_Tuple(val);
+    return to_Double(val);
 }
 std::any builtin_Str_call(EvalVisitor &vis, Python3Parser::ArglistContext *ctx){
-    return to_String(vis.visit(ctx));
+    std::any val = vis.visitArglist(ctx);
+    release_Tuple(val);
+    return to_String(val);
 }
 std::any builtin_Bool_call(EvalVisitor &vis, Python3Parser::ArglistContext *ctx){
-    return to_Bool(vis.visit(ctx));
+    std::any val = vis.visitArglist(ctx);
+    release_Tuple(val);
+    return to_Bool(val);
 }
 std::any builtin_Print_call(EvalVisitor &vis, Python3Parser::ArglistContext *ctx){
     Debug_output("__builtin_Print_call__");
@@ -27,9 +35,10 @@ std::any builtin_Print_call(EvalVisitor &vis, Python3Parser::ArglistContext *ctx
 
     std::vector<Python3Parser::ArgumentContext*> Outputs = ctx->argument();
     if (!Outputs.empty()) {
-        std::cout << vis.visit(Outputs[0]);
-        for (int i = 1; i < Outputs.size(); i++)
-            std::cout << ' ' << vis.visit(Outputs[i]);
+        std::cout << vis.visitArgument(Outputs[0]);
+        for (int i = 1; i < Outputs.size(); i++){
+            std::cout << ' ' << vis.visitArgument(Outputs[i]);
+        }
     }
     std::cout << std::endl;
     return {};
@@ -50,8 +59,16 @@ std::any func_call(std::string Name, EvalVisitor &vis, Python3Parser::ArglistCon
             Debug_output("____find_the_function_____");
             std::vector<std::pair<std::string, std::any> > Arglists_init = (*find_it).second.first;
 
+            if (ctx!=nullptr){
+                std::vector<std::any> inits = std::any_cast<std::vector<std::any>>(vis.visitArglist(ctx)); //is a vector
+                for (int i = 0; i < inits.size(); i++) {
+                    Arglists_init[i].second = inits[i];
+                }
+            }
+
             new_Namespace(Arglists_init);
             new_Funcspace();
+
 
             Python3Parser::SuiteContext *func_ctx = (*find_it).second.second;
             std::any ret = vis.visitSuite(func_ctx);

@@ -38,7 +38,6 @@ std::any func_call(std::string Name, EvalVisitor &vis, Python3Parser::ArglistCon
 void new_Funcspace();
 void delete_Funcspace();
 
-
 //--------------------------------------------
 
 //变量空间

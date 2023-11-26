@@ -74,18 +74,21 @@ bool is_FlowReturn(std::any const &a){
     }
     return false;
 }
+bool is_Var(std::any const &a){
+    return (std::any_cast<std::pair<std::string, std::any>>(&a));
+}
 
-void release_Var(std::any &a){ //把(var)释放成var
+void release_Tuple(std::any &a){ //把(var)释放成var
     //ATTENTION:()也是Tuple，而不是None
     std::vector<std::any>* ptr1=std::any_cast<std::vector<std::any> >(&a);
     if (!ptr1) return;//Tuple()
     Debug_output("IS TUPLE");
     if (ptr1->size() == 1) {
         a = (*ptr1)[0];
-        release_Var(a);
+        release_Tuple(a);
     }else if (ptr1->size() > 0){
             for (int i = 0; i < ptr1->size(); i++)//ATTENTION:这里用了小int
-                release_Var( (*ptr1)[i] );
+                release_Tuple((*ptr1)[i]);
     }
 }//PERHAPS WRONG!!!!!
 
@@ -128,15 +131,36 @@ std::string to_String(std::any const &a){
 }
 bool to_Bool(std::any const &a){
     if (is_Bool(a)) return (std::any_cast<bool>(a));
-    if (is_Int(a)) return (bool)(std::any_cast<Int>(a));
-    if (is_Double(a)) return (bool)(std::any_cast<double>(a));
+    if (is_Int(a)){
+        if (std::any_cast<Int>(a)!=0) return true;
+        else return false;
+    }
+    if (is_Double(a)) {
+        if (fabs(std::any_cast<double>(a))<1e-9) return false;
+        return true;
+    }
     if (is_String(a)) {
         std::string tmp = to_String(a);
         if (tmp.length() > 0) return true;
         return false;
     }
-    //None and Tuple待完成
+    //TODO None and Tuple待完成
     throw std::runtime_error("Invalid type at to_Bool");
+}
+void release_Var(std::any &a){
+    if (std::any_cast<std::vector<std::any>>(&a)) {
+        std::vector<std::any> tmp = std::any_cast<std::vector<std::any>>(a);
+        for (int i = 0; i < tmp.size(); i++)
+            release_Var( tmp[i] );
+        a = tmp;
+    }
+    if (is_Var(a))
+        a = std::any_cast<std::pair<std::string, std::any>>(a).second;
+}
+std::string get_varName(std::any const &a){
+    if (is_Var(a))
+        return std::any_cast<std::pair<std::string, std::any>>(a).first;
+    return to_String(a);
 }
 
 //四则运算
@@ -315,8 +339,16 @@ std::ostream &operator<<(std::ostream &os, std::any const &a){
         double tmp = to_Double(a);
         if (fabs(tmp) < 1e-9) tmp=0;
         os << std::fixed << std::setprecision(6) << tmp; //学自Wkp
+    } else if (is_Var(a)){
+        std::any b=a;
+        release_Var(b);
+        release_Tuple(b);
+        os << b;
+    } else if (is_String(a)){
+        os << to_String(a);
+    } else if (is_Tuple(a)){
+
     }
-    //关于函数部分 如何实现？
     return os;
 }
 

@@ -18,7 +18,7 @@ long long String_to_Int(std::string x);
 bool is_variable(std::any const &a);
 
 //解除Tuple
-void release_Var(std::any &a);
+void release_Tuple(std::any &a);
 //判断类型
 bool is_Int(std::any const &a);
 bool is_Double(std::any const &a);
@@ -31,12 +31,16 @@ bool is_None(std::any const &a);
 bool is_FlowBreak(std::any const &a);
 bool is_FlowContinue(std::any const &a);
 bool is_FlowReturn(std::any const &a);
+bool is_Var(std::any const &a);
 
 //类型转换
 Int to_Int(std::any const &a);
 double to_Double(std::any const &a);
 std::string to_String(std::any const &a);
 bool to_Bool(std::any const &a);
+void release_Var(std::any &a);
+std::string get_varName(std::any const &a);
+//运算
 std::any operator+(std::any const &a1,std::any const &a2);
 std::any operator-(std::any const &a1,std::any const &a2);
 std::any operator*(std::any const &a1,std::any const &a2);
@@ -44,7 +48,7 @@ std::any operator/(std::any const &a1,std::any const &a2);
 std::any operator-(std::any const &a1);
 std::any DivInt(std::any const &a1,std::any const &a2);
 std::any DivDouble(std::any const &a1,std::any const &a2);
-std::any operator%(std::any const &a, std::any const &b); //TODO 待实现
+std::any operator%(std::any const &a, std::any const &b);
 // 比较运算符
 bool operator==(std::any const &a1,std::any const &a2);
 bool operator<(std::any const &a1,std::any const &a2);
