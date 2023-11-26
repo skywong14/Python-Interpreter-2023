@@ -53,6 +53,27 @@ bool is_Tuple(std::any const &a){
 bool is_None(std::any const &a){
     return !a.has_value();
 }
+bool is_FlowBreak(std::any const &a){
+    auto ptr = std::any_cast<Flow_stmt>(&a);
+    if (ptr != nullptr){
+        return (std::any_cast<Flow_stmt>(a) == Flow_stmt::Flow_Break);
+    }
+    return false;
+}
+bool is_FlowContinue(std::any const &a){
+    auto ptr = std::any_cast<Flow_stmt>(&a);
+    if (ptr != nullptr){
+        return (std::any_cast<Flow_stmt>(a) == Flow_stmt::Flow_Continue);
+    }
+    return false;
+}
+bool is_FlowReturn(std::any const &a){
+    auto ptr = std::any_cast<std::pair<Flow_stmt, std::any> >(&a);
+    if (ptr != nullptr){
+        return (std::any_cast<std::pair<Flow_stmt, std::any> >(a).first == Flow_stmt::Flow_Return);
+    }
+    return false;
+}
 
 void release_Var(std::any &a){ //把(var)释放成var
     //ATTENTION:()也是Tuple，而不是None
@@ -144,10 +165,10 @@ std::any operator+(std::any const &a1, std::any const &a2){
 std::any operator-(std::any const &a1, std::any const &a2){
     if (is_Number(a1) && is_Number(a2)){
         if (is_Double(a1) || is_Double(a2)){
-            double tmp = to_Double(a1) + to_Double(a2);
+            double tmp = to_Double(a1) - to_Double(a2);
             return tmp;
         }else {
-            Int tmp = to_Int(a1) + to_Int(a2);
+            Int tmp = to_Int(a1) - to_Int(a2);
             return tmp;
         }
     }

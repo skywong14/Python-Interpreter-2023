@@ -29,32 +29,97 @@ std::any EvalVisitor::visitFlow_stmt(Python3Parser::Flow_stmtContext *ctx){
     }
     return visitChildren(ctx);
 }
-//IF WHILE RETURN
+//IF WHILE
 
+std::any EvalVisitor::visitIf_stmt(Python3Parser::If_stmtContext *ctx) {
+    Debug_output("If_stmt::");
+    auto tests = ctx->test();
+    auto suites = ctx->suite();
+    //If && else if
+    for (int i = 0; i < tests.size(); i++) {
+        if (to_Bool(visitTest(tests[i])))
+            return visitSuite(suites[i]);
+    }
+    //else
+    if (tests.size() < suites.size())
+        return visitSuite(suites.back());
+    return {};
+}
+
+antlrcpp::Any EvalVisitor::visitWhile_stmt(Python3Parser::While_stmtContext *ctx) {
+    Debug_output("While_stmt::");
+    auto judge_test = ctx->test();
+    auto suites = ctx->suite();
+    while (to_Bool(visitTest(judge_test))) {
+        Debug_output("_____In the while____");
+        std::any val = visitSuite(suites);
+        if (is_FlowBreak(val))
+            break;
+        if (is_FlowReturn(val))
+            return val;
+    }
+    return {};
+}
 //Expr:expr_stmt: testlist ( (augassign testlist) | ('=' testlist)*);
 std::any EvalVisitor::visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx){
-    //ATTENTION区分左值右值
     Debug_output("Expr_stmt");
     if (!(ctx->ASSIGN(0) || ctx->augassign())) return visitChildren(ctx);
     //先按等号分割
     auto ctx1 = ctx->testlist(); // ctx1:所有testlist,除最后一个外为左值
     int left_v_num = static_cast<int>(ctx1.size()) - 1;
     std::vector<std::any> right_v = std::any_cast<std::vector<std::any> >(visitTestlist(ctx1.back()));
+    int right_size = right_v.size();
     std::any right_v_all = right_v;
     release_Var(right_v_all);
     //ATTENTION: visitTestlist返回一个vector！！！(release后如果是单个元素，加上一层）
-    int right_size = right_v.size();
-    //right_size = 1 or right_size > 1
-    //TODO
+
     std::string Variable_name;
-    for (int i = 0; i < left_v_num; i++){
-        std::vector<std::any> left_v = std::any_cast<std::vector<std::any> >(visitTestlist(ctx1[i]));
-        if (left_v.size() == 1){
-            Variable_name = to_String(left_v[0]);
-            set_Variable(Variable_name, right_v_all);
-            Debug_output("____LEFT_V==1____");
+    if (ctx->augassign()){
+        //augassign赋值 ATTENTION:tuple不合法，不用管
+        std::string opt = ctx->augassign()->getText();
+        Variable_name = ctx1[0]->getText();
+        //如果未定义应当报错
+        if (!Variable_exist(Variable_name)) //需要考虑是不是当前namespace空间?
+            throw std::runtime_error("Have not define Augassign left value");
+        Variable_it ptr = search_Scope(Variable_name);
+        std::any val =  (ptr.second)->second;
+        std::any sol;
+        if (opt == "+=") {
+            sol = val + right_v_all;
+        } else if (opt == "-=") {
+            sol = val - right_v_all;
+        } else if (opt == "*=") {
+            sol = val * right_v_all;
+        } else if (opt == "/=") {
+            sol = val / right_v_all;
+        } else if (opt == "//=") {
+            if (is_Integer(val) && is_Integer(right_v_all))
+                sol = DivInt(val, right_v_all);
+            else
+                sol = DivDouble(val, right_v_all);
+        } else if (opt == "%=") {
+            sol = val % right_v_all;
+        }
+        set_Variable(Variable_name, sol);
+        return sol;
+    }else{
+        //等号赋值
+        for (int i = 0; i < left_v_num; i++){
+            std::vector<std::any> left_v = std::any_cast<std::vector<std::any> >(visitTestlist(ctx1[i]));
+            if (left_v.size() == 1){
+                Variable_name = to_String(left_v[0]);
+                set_Variable(Variable_name, right_v_all);
+                Debug_output("____LEFT_V==1____");
+            }else{
+                for (int j = 0; j < left_v_num; j++){
+                    Variable_name = to_String(left_v[j]);
+                    set_Variable(Variable_name, right_v[j]);
+                }
+                Debug_output("____LEFT_V==TUPLE____");
+            }
         }
     }
+
     return {};
 }
 //stmt操作
@@ -71,13 +136,17 @@ std::any EvalVisitor::visitSuite(Python3Parser::SuiteContext *ctx){
     Debug_output("Suite_stmt");
     //简单语句
     if (ctx->simple_stmt()){
-        std::any st1 = visitSimple_stmt(ctx->simple_stmt());
-        //TODO 有flow则退出
+        return visitSimple_stmt(ctx->simple_stmt());
     }
     //复合语句：依次执行，除非有flow控制
     for (int i = 0; ctx->stmt(i); i++){
         std::any st1 = visitStmt(ctx->stmt(i));
-        //TODO 有flow则退出
+        if (is_FlowBreak(st1))
+            return Flow_stmt::Flow_Break;
+        if (is_FlowContinue(st1))
+            return Flow_stmt::Flow_Continue;
+        if (is_FlowReturn(st1))
+            return st1;
     }
     return {};
 }
@@ -304,3 +373,13 @@ std::any EvalVisitor::visitTestlist(Python3Parser::TestlistContext *ctx){
     return vars;
 }
 
+std::any EvalVisitor::visitArglist(Python3Parser::ArglistContext *ctx) {
+    auto ctx1 = ctx->argument();
+    std::vector<std::any> ret_array;
+    ret_array.clear();
+    for (int i = 0; i < ctx1.size(); i++){
+        std::any val = visitArgument(ctx1[i]);
+        ret_array.push_back(val);
+    }
+    return ret_array;
+}

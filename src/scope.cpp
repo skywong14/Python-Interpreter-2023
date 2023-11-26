@@ -84,7 +84,9 @@ void set_Variable(std::string Name, std::any val){
         newVariable();
     }*/
 }
-
+bool Variable_exist(std::string var_Name){
+    return (search_Scope(var_Name).first != null_Scope());
+}
 Variable_it search_Scope(std::string var_Name){
     return search_Scope(scope.end(), var_Name);
 }

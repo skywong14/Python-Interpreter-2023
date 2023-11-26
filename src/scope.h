@@ -58,7 +58,7 @@ typedef std::pair<Scope_it ,Names_it> Variable_it;
 Scope_it null_Scope();
 
 Variable_it search_Built_in(std::string Name);
-
+bool Variable_exist(std::string var_Name);
 void set_Variable(std::string Name, std::any val);
 void newVariable(std::string var_Name, std::any value);//默认在栈顶scope内新建
 Variable_it search_Scope(std::string var_Name);

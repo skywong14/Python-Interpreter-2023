@@ -29,9 +29,9 @@ public:
 
 //    virtual std::any visitCompound_stmt(Python3Parser::Compound_stmtContext *ctx) override;
 
-//    virtual std::any visitIf_stmt(Python3Parser::If_stmtContext *ctx) override;
+    virtual std::any visitIf_stmt(Python3Parser::If_stmtContext *ctx) override;
 
-//    virtual std::any visitWhile_stmt(Python3Parser::While_stmtContext *ctx) override;
+    virtual std::any visitWhile_stmt(Python3Parser::While_stmtContext *ctx) override;
 
     virtual std::any visitSuite(Python3Parser::SuiteContext *ctx) override;
 
@@ -59,7 +59,7 @@ public:
 
     virtual std::any visitTestlist(Python3Parser::TestlistContext *ctx) override;
 
-//    virtual std::any visitArglist(Python3Parser::ArglistContext *ctx) override;
+    virtual std::any visitArglist(Python3Parser::ArglistContext *ctx) override;
 
 //    virtual std::any visitArgument(Python3Parser::ArgumentContext *ctx) override;
 };

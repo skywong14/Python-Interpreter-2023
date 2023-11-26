@@ -28,6 +28,9 @@ bool is_Integer(std::any const &a);
 bool is_Number(std::any const &a);
 bool is_Tuple(std::any const &a);
 bool is_None(std::any const &a);
+bool is_FlowBreak(std::any const &a);
+bool is_FlowContinue(std::any const &a);
+bool is_FlowReturn(std::any const &a);
 
 //类型转换
 Int to_Int(std::any const &a);
