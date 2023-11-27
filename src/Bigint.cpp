@@ -401,6 +401,17 @@ namespace sjtu {
 
         int2048 &int2048::operator/=(const int2048 &other){
             int2048 Self(*this);
+            //special judge
+            if (Self.num.size()<=3 && other.num.size()<=3){
+                long long tmp1 = Self.int2048_to_longlong();
+                int2048 Other(other);
+                long long tmp2 = Other.int2048_to_longlong();
+                long long ans = tmp1/tmp2;
+                if (tmp2 * ans > tmp1) ans--;
+                int2048 newans(ans);
+                *this = newans;
+                return (*this);
+            }
             int ans_flag = 1;
             if (Self.flag == other.flag){
                 ans_flag = 1;
@@ -501,6 +512,15 @@ namespace sjtu {
             for (int i = static_cast<int>(x.num.size())-1; i>=0; i--){
                 ans = ans + std::to_string(x.num[i]);
             }
+            return ans;
+        }
+        long long int2048::int2048_to_longlong(){
+            int2048 x(*this);
+            long long ans=0;
+            for (int i = static_cast<int>(x.num.size())-1; i>=0; i--){
+                ans = ans * base + x.num[i];
+            }
+            if (!x.flag) return -ans;
             return ans;
         }
 //}
