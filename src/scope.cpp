@@ -65,9 +65,7 @@ std::any func_call(std::string Name, EvalVisitor &vis, Python3Parser::ArglistCon
             if (ctx!=nullptr){
                 std::vector<std::any> inits = std::any_cast<std::vector<std::any>>(vis.visitArglist(ctx)); //is a vector
                 for (int i = 0; i < inits.size(); i++) {
-//                    std::cout<<Name<<':'<<i<<"?";
                     release_Var(inits[i]);//update
-//                    std::cout<<inits[i]<<".\n";
                     Arglists_init[i].second = inits[i];
                 }
             }
@@ -85,7 +83,6 @@ std::any func_call(std::string Name, EvalVisitor &vis, Python3Parser::ArglistCon
                 std::pair<Flow_stmt, std::any> tmp = std::any_cast<std::pair<Flow_stmt, std::any> >(ret);
                 if (is_Tuple(tmp.second)) {
                     std::vector<std::any> t2 = std::any_cast<std::vector<std::any>>(tmp.second);
-//                    std::cout<<"RETURN!"<<t2[0]<<"!"<<std::endl;
                 }
                 return std::any_cast<std::pair<Flow_stmt, std::any> >(ret).second;
             }else
@@ -141,7 +138,6 @@ bool Variable_exist(std::string var_Name){
     return (search_Scope(var_Name).first != null_Scope());
 }
 Variable_it search_Scope(std::string var_Name){
-//    std::cout<<"serach:"<<var_Name<<"\n";
     return search_Scope(scope.end(), var_Name);
 }
 Variable_it search_Scope(Scope_it it_Scope, std::string var_Name){
