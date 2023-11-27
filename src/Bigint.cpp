@@ -402,7 +402,7 @@ namespace sjtu {
         int2048 &int2048::operator/=(const int2048 &other){
             int2048 Self(*this);
             //special judge
-            if (Self.num.size()<=3 && other.num.size()<=3){
+            if (Self.num.size()<=4 && other.num.size()<=4){
                 long long tmp1 = Self.int2048_to_longlong();
                 int2048 Other(other);
                 long long tmp2 = Other.int2048_to_longlong();
