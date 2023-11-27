@@ -320,6 +320,14 @@ bool operator==(std::any const &a1, std::any const &a2){
     if (is_String(a1) && is_String(a2)){
         return to_String(a1) == to_String(a2);
     }
+    if (is_Tuple(a1) && is_Tuple(a2)){
+        std::vector<std::any> val1 = std::any_cast<std::vector<std::any>>(a1);
+        std::vector<std::any> val2 = std::any_cast<std::vector<std::any>>(a2);
+        if (val1.size() != val2.size()) return false;
+        for (int i = 0; i < val1.size(); i++)
+            if (val1[i] != val2[i]) return false;
+        return true;
+    }
     return false;
 }
 bool operator<(std::any const &a1, std::any const &a2){
