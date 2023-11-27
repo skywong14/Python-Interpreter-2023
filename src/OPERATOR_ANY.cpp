@@ -101,6 +101,11 @@ Int to_Int(std::any const &a){
         Int tmp2(tmp);
         return tmp2;
     }
+    if (is_String(a)){
+        std::string str = to_String(a);
+        Int a(str);
+        return a;
+    }
     throw std::runtime_error("Invalid type at to_Int");
 //    return 0;
 }
@@ -119,6 +124,15 @@ double to_Double(std::any const &a){
 }
 std::string to_String(std::any const &a){
     if (is_String(a)) return (std::string)std::any_cast<std::string>(a);
+    if (is_Bool(a)){
+        std::string str;
+        if (to_Bool(a)) str="True";else str="False";
+        return str;
+    }
+    if (is_Int(a)){
+        Int tmp = std::any_cast<Int>(a);
+        return tmp.int2048_to_String();
+    }
     throw std::runtime_error("Invalid type at to_String");
 }
 bool to_Bool(std::any const &a){

@@ -494,6 +494,15 @@ namespace sjtu {
             if (!x.flag) return -ans;
             return ans;
         }
+        std::string int2048::int2048_to_String(){
+            int2048 x(*this);
+            std::string ans="";
+            if (!x.flag) ans = "-";
+            for (int i = static_cast<int>(x.num.size())-1; i>=0; i--){
+                ans = ans + std::to_string(x.num[i]);
+            }
+            return ans;
+        }
 //}
 
 } // namespace sjtu

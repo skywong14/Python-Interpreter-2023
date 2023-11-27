@@ -98,6 +98,7 @@ namespace sjtu {
         friend bool operator<=(const int2048 &n1, const int2048 &n2);
         friend bool operator>=(const int2048 &n1, const int2048 &n2);
         double int2048_to_Double();
+        std::string int2048_to_String();
     };
 } // namespace sjtu
 
