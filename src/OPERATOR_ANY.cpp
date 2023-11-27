@@ -83,7 +83,7 @@ void release_Tuple(std::any &a){ //把(var)释放成var
             for (int i = 0; i < ptr1->size(); i++)//ATTENTION:这里用了小int
                 release_Tuple((*ptr1)[i]);
     }
-}//PERHAPS WRONG!!!!!
+}//PERHAPS WRONG
 
 //类型转换
 Int to_Int(std::any const &a){
@@ -158,7 +158,6 @@ std::string get_varName(std::any const &a){
 //四则运算
 std::any operator+(std::any const &any1, std::any const &any2){
     std::any a1=any1, a2=any2;
-    release_Tuple(a1); release_Tuple(a2);
     release_Var(a1); release_Var(a2);
     std::any a3;
     if (is_Number(a1) && is_Number(a2)){
@@ -227,7 +226,6 @@ std::any operator*(std::any const &any1, std::any const &any2){
         for (int i = 1; i <= tmp; i++) s1 += s2;
         return s1;
     }//TLE
-//    std::cout<<a1<<','<<a2<<std::endl;
     throw std::runtime_error("Undefined at operator*");
 }
 
@@ -353,7 +351,7 @@ std::ostream &operator<<(std::ostream &os, std::any const &a){
     } else if (is_String(a)){
         os << to_String(a);
     } else if (is_Tuple(a)){
-
+        //不用实现
     }
     return os;
 }

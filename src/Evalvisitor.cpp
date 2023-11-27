@@ -2,12 +2,12 @@
 #include "Evalvisitor.h"
 #include "OPERATOR_ANY.h"
 #include "scope.h"
+#include <iostream>
 #define Int sjtu::int2048
 
 //函数部分
 std::any EvalVisitor::visitParameters(Python3Parser::ParametersContext *ctx){
-    std::vector<std::pair<std::string, std::any> > Arglist_init;
-    Arglist_init.clear();
+    std::vector<std::pair<std::string, std::any> > Arglist_init={};
     if (!ctx->typedargslist())
         return Arglist_init;
     auto types = ctx->typedargslist()->tfpdef();
@@ -43,7 +43,10 @@ std::any EvalVisitor::visitFlow_stmt(Python3Parser::Flow_stmtContext *ctx){
         auto test_list = ctx->return_stmt()->testlist();
         if (test_list)
             val = std::any_cast<std::vector<std::any> >(visitTestlist(test_list));
+        for (int i = 0; i < val.size(); i++)
+            release_Var(val[i]);
         std::any val2 = val;
+        release_Tuple(val2);
         return std::make_pair(Flow_stmt::Flow_Return, val2);
     }
     return visitChildren(ctx);
@@ -107,7 +110,7 @@ std::any EvalVisitor::visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx){
     }
     std::any right_v_all = right_v;
     release_Tuple(right_v_all);
-    //ATTENTION: visitTestlist返回一个vector！！！(release后如果是单个元素，加上一层）
+    //ATTENTION: visitTestlist返回一个vector
 
     std::string Variable_name;
     if (ctx->augassign()){
@@ -154,7 +157,7 @@ std::any EvalVisitor::visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx){
                 }
             }
         }
-        return {};
+        return right_v_all;//update
     }
     return {};
 }
@@ -185,9 +188,7 @@ std::any EvalVisitor::visitSuite(Python3Parser::SuiteContext *ctx){
         if (is_FlowContinue(st1))
             return Flow_stmt::Flow_Continue;
         if (is_FlowReturn(st1)){
-            std::any val = (std::any_cast<std::pair<Flow_stmt, std::any> >(st1)).second;
-            release_Tuple(val);
-            return val;
+            return st1;
         }
     }
     return {};
@@ -428,11 +429,25 @@ std::any EvalVisitor::visitTestlist(Python3Parser::TestlistContext *ctx){
 
 std::any EvalVisitor::visitArglist(Python3Parser::ArglistContext *ctx){
     auto ctx1 = ctx->argument();
-    std::vector<std::any> ret_array;
-    ret_array.clear();
+    std::vector<std::any> ret_array={};
     for (int i = 0; i < ctx1.size(); i++){
         std::any val = visitArgument(ctx1[i]);
-        ret_array.push_back(val);
+        if (is_Var(val)){
+            release_Var(val);
+        }
+        ret_array.emplace_back(val);
     }
     return ret_array;
+}
+std::any EvalVisitor::visitArgument(Python3Parser::ArgumentContext *ctx) {
+    if (ctx->test(1)) {
+        std::any val = visitTest(ctx->test(1));
+        release_Var(val);
+        std::string Name = ctx->test(0)->getText();
+        return std::make_pair(Name,val);
+    }else{
+        std::any val = visitTest(ctx->test(0));
+        release_Var(val);
+        return val;
+    }
 }

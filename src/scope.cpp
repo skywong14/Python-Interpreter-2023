@@ -45,6 +45,9 @@ std::any builtin_Print_call(EvalVisitor &vis, Python3Parser::ArglistContext *ctx
 }
 
 void func_Define(std::string Name, std::vector<std::pair<std::string, std::any> >Arglists, Python3Parser::SuiteContext *ctx){
+//    auto it = func_scope.end();
+//    it--;
+//    (*it).Names[Name] = std::make_pair(Arglists, ctx);
     func_scope.back().Names[Name] = std::make_pair(Arglists, ctx);
 }
 
@@ -56,19 +59,21 @@ std::any func_call(std::string Name, EvalVisitor &vis, Python3Parser::ArglistCon
         func_scope_it--;
         auto find_it = (*func_scope_it).Names.find(Name);
         if ( find_it != (*func_scope_it).Names.end()) {
+
             Debug_output("____find_the_function_____");
             std::vector<std::pair<std::string, std::any> > Arglists_init = (*find_it).second.first;
-
             if (ctx!=nullptr){
                 std::vector<std::any> inits = std::any_cast<std::vector<std::any>>(vis.visitArglist(ctx)); //is a vector
                 for (int i = 0; i < inits.size(); i++) {
+//                    std::cout<<Name<<':'<<i<<"?";
+                    release_Var(inits[i]);//update
+//                    std::cout<<inits[i]<<".\n";
                     Arglists_init[i].second = inits[i];
                 }
             }
 
             new_Namespace(Arglists_init);
             new_Funcspace();
-
 
             Python3Parser::SuiteContext *func_ctx = (*find_it).second.second;
             std::any ret = vis.visitSuite(func_ctx);
@@ -77,6 +82,11 @@ std::any func_call(std::string Name, EvalVisitor &vis, Python3Parser::ArglistCon
             delete_Funcspace();
 
             if (is_FlowReturn(ret)) {
+                std::pair<Flow_stmt, std::any> tmp = std::any_cast<std::pair<Flow_stmt, std::any> >(ret);
+                if (is_Tuple(tmp.second)) {
+                    std::vector<std::any> t2 = std::any_cast<std::vector<std::any>>(tmp.second);
+//                    std::cout<<"RETURN!"<<t2[0]<<"!"<<std::endl;
+                }
                 return std::any_cast<std::pair<Flow_stmt, std::any> >(ret).second;
             }else
                 return ret;
@@ -131,10 +141,10 @@ bool Variable_exist(std::string var_Name){
     return (search_Scope(var_Name).first != null_Scope());
 }
 Variable_it search_Scope(std::string var_Name){
+//    std::cout<<"serach:"<<var_Name<<"\n";
     return search_Scope(scope.end(), var_Name);
 }
 Variable_it search_Scope(Scope_it it_Scope, std::string var_Name){
-
     if (it_Scope == scope.end()) it_Scope--;
 
     auto ptr = (*it_Scope).Names.find(var_Name);
@@ -149,13 +159,13 @@ Variable_it search_Scope(Scope_it it_Scope, std::string var_Name){
     }
 }
 Variable_it new_Namespace(std::vector<std::pair<std::string, std::any> >Arglists){
-    NameSpace new_space;
+    NameSpace new_space={};
     std::string Name;
     for (int i = 0; i < Arglists.size(); i++){
         Name = Arglists[i].first;
         new_space.Names[Name] = Arglists[i].second;
     }
-    scope.push_back(new_space);
+    scope.emplace_back(new_space);
     auto it = scope.end();
     it--;
     return std::make_pair(it, (*it).Names.begin());
