@@ -163,11 +163,11 @@ std::any EvalVisitor::visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx){
 }
 //stmt操作
 std::any EvalVisitor::visitSimple_stmt(Python3Parser::Simple_stmtContext *ctx){
-//    Debug_output("Simple_stmt");
+    Debug_output("Simple_stmt");
     return visitSmall_stmt(ctx->small_stmt());
 }
 std::any EvalVisitor::visitSmall_stmt(Python3Parser::Small_stmtContext *ctx){
-//    Debug_output("Small_stmt");
+    Debug_output("Small_stmt");
     if (ctx->flow_stmt()){
         return visitFlow_stmt(ctx->flow_stmt());
     }
@@ -175,11 +175,11 @@ std::any EvalVisitor::visitSmall_stmt(Python3Parser::Small_stmtContext *ctx){
 }
 //suite
 std::any EvalVisitor::visitSuite(Python3Parser::SuiteContext *ctx){
-    Debug_output("Suite_stmt");
     //简单语句
     if (ctx->simple_stmt()){
         return visitSimple_stmt(ctx->simple_stmt());
     }
+    Debug_output("Suite_stmt");
     //复合语句：依次执行，除非有flow控制
     for (int i = 0; ctx->stmt(i); i++){
         std::any st1 = visitStmt(ctx->stmt(i));
@@ -197,7 +197,7 @@ std::any EvalVisitor::visitSuite(Python3Parser::SuiteContext *ctx){
 //Or_test && And_test
 std::any EvalVisitor::visitOr_test(Python3Parser::Or_testContext *ctx){
     if (ctx->OR(0)){
-//        Debug_output("Or_test");
+        Debug_output("Or_test");
         std::vector<Python3Parser::And_testContext *> andtext = ctx->and_test();
         for (auto it = andtext.begin(); it != andtext.end(); it++){
             std::any val = visitAnd_test((*it));
