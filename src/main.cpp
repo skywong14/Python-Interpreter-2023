@@ -9,6 +9,7 @@ using namespace antlr4;
 int main(int argc, const char *argv[]) {
 	// TODO: please don't modify the code below the construction of ifs if you want to use visitor mode
 //    freopen("test1.in","r",stdin); //ATTENTION ::FOR DEBUG ONLY
+//    freopen("test1.out","w",stdout); //ATTENTION ::FOR DEBUG ONLY
 	ANTLRInputStream input(std::cin);
 	Python3Lexer lexer(&input);
 	CommonTokenStream tokens(&lexer);

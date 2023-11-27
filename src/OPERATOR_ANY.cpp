@@ -329,6 +329,9 @@ bool operator<(std::any const &a1, std::any const &a2){
     if (is_Integer(a1) && is_Integer(a2)){
         return to_Int(a1) < to_Int(a2);
     }
+    if (is_Number(a1) && is_Number(a2)){
+        return to_Double(a1) < to_Double(a2);
+    }
     if (is_String(a1) && is_String(a2)){
         return to_String(a1) < to_String(a2);
     }

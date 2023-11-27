@@ -127,12 +127,6 @@ void set_Variable(std::string Name, std::any val){
     auto it = scope.end();
     it--;
     (*it).set_New(Name, val);
-    /*Variable_it ptr = search_Scope(scope.end(), Name);
-    if (ptr.first != scope.end()){
-        (*(ptr.second)).second = val;
-    }else{
-        newVariable();
-    }*/
 }
 bool Variable_exist(std::string var_Name){
     return (search_Scope(var_Name).first != null_Scope());
