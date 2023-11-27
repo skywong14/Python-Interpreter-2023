@@ -266,12 +266,15 @@ std::any DivInt(std::any const &any1, std::any const &any2){
     std::any a1=any1, a2=any2;
     release_Var(a1); release_Var(a2);
     if (is_Number(a1) && is_Number(a2)){
-        if (is_Double(a1) || is_Double(a2)){
+        double n1 = to_Double(a1),n2 = to_Double(a2);
+        return (Int)(floor(n1 / n2));
+        /*if (is_Double(a1) || is_Double(a2)){
             double n1 = to_Double(a1),n2 = to_Double(a2);
             return (Int)(floor(n1 / n2));
         }
         Int n1 = to_Int(a1),n2 = to_Int(a2);
-        return (Int)(n1 / n2);
+        n1 /= n2;
+        return n1;*/
     }
     throw std::runtime_error("Undefined at operator DivInt");
 }
