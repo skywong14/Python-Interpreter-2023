@@ -171,7 +171,7 @@ std::string get_varName(std::any const &a){
 
 //四则运算
 std::any operator+(std::any const &any1, std::any const &any2){
-    std::any a1=any1, a2=any2;
+    std::any a1 = any1, a2 = any2;
     release_Var(a1); release_Var(a2);
     std::any a3;
     if (is_Number(a1) && is_Number(a2)){
@@ -181,7 +181,7 @@ std::any operator+(std::any const &any1, std::any const &any2){
             return a3;
         }else{
             Int tmp = to_Int(a1) + to_Int(a2);
-            a3=tmp;
+            a3 = tmp;
             return a3;
         }
     }
@@ -195,7 +195,7 @@ std::any operator+(std::any const &any1, std::any const &any2){
         std::vector<std::any> list2 = std::any_cast<std::vector<std::any>>(a2);
         for (int i = 0; i < list2.size(); i++)
             list1.emplace_back(list2[i]);
-        a3=list1;
+        a3 = list1;
         return a3;
     }
     //其他情况
@@ -203,7 +203,7 @@ std::any operator+(std::any const &any1, std::any const &any2){
 //    return 0;
 }
 std::any operator-(std::any const &any1, std::any const &any2){
-    std::any a1=any1, a2=any2;
+    std::any a1 = any1, a2 = any2;
     release_Var(a1); release_Var(a2);
     if (is_Number(a1) && is_Number(a2)){
         if (is_Double(a1) || is_Double(a2)){
@@ -217,7 +217,7 @@ std::any operator-(std::any const &any1, std::any const &any2){
     throw std::runtime_error("Undefined at operator-");
 }
 std::any operator*(std::any const &any1, std::any const &any2){
-    std::any a1=any1, a2=any2;
+    std::any a1 = any1, a2 = any2;
     release_Var(a1); release_Var(a2);
     if (is_Number(a1) && is_Number(a2)) {
         if (is_Double(a1) || is_Double(a2)){
@@ -263,7 +263,7 @@ std::any operator-(std::any const &a1) {
 
 //div & mod
 std::any DivInt(std::any const &any1, std::any const &any2){
-    std::any a1=any1, a2=any2;
+    std::any a1 = any1, a2 = any2;
     release_Var(a1); release_Var(a2);
     if (is_Number(a1) && is_Number(a2)){
         if (is_Double(a1) || is_Double(a2)){
@@ -370,7 +370,7 @@ std::ostream &operator<<(std::ostream &os, std::any const &a){
         if (fabs(tmp) < 1e-9) tmp=0;
         os << std::fixed << std::setprecision(6) << tmp; //学自Wkp
     } else if (is_Var(a)){
-        std::any b=a;
+        std::any b = a;
         release_Var(b);
         release_Tuple(b);
         os << b;
